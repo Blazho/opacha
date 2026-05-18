@@ -74,6 +74,9 @@ export class BasicNode {
     }
 
     public setTargetNode(newTarget: BasicNode){
+        if(newTarget === this){
+            return;
+        }
         if(!this.connectedTo.has(newTarget.id)){
             console.error(`Node ${newTarget.id} not connected to selected node ${this.id}`);
             return

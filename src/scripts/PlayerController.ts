@@ -46,7 +46,7 @@ export class PlayerController{
             this.clickTimer = setTimeout(()=>{
                 const pos = this.getMousePosition(e)
                 this.playerGroup.selectNode(pos)
-            }, 250)
+            }, 150)
         })
     }
 

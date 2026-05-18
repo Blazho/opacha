@@ -25,12 +25,10 @@ export class ControlGroup {
                 this.selectedNode.setTargetNode(targetNode)
             }
             this.selectedNode = null
-            console.log("selectedNode cleared")
         }else {
             const targetNode = this.findNode(clickPosition)
             if(targetNode){
                 this.selectedNode = targetNode
-                console.log("selectedNode", targetNode)
             }
         }
     }
