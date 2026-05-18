@@ -5,38 +5,57 @@ import {BasicNode} from "../../prefabs/node.js";
 export class IdleState extends AbstractState{
     override readonly stateName: string = "IdleState";
     private node: BasicNode
-
+    private incrementArmyInterval: number
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
+        this.incrementArmyInterval = 0
+    }
 
+    onBegin() {
+        this.incrementArmyInterval = setInterval(() => {
+            this.node.incrementArmy()
+        }, 1000)
     }
 
     onUpdate() {
-        this.node.incrementArmy()
+    }
+
+    onEnd() {
+        clearInterval(this.incrementArmyInterval)
     }
 }
 
 export class SendState extends AbstractState{
     override readonly stateName: string = "SendState";
     private node: BasicNode
-    private targetNode: BasicNode | null //todo bug target cant be in shared states
+    private sendInterval: number
+    private incrementArmyInterval: number
 
-
-    constructor(node: BasicNode,  targetNode: BasicNode | null) {
+    constructor(node: BasicNode) {
         super();
         this.node = node;
-        this.targetNode = targetNode;
+        this.sendInterval = 0
+        this.incrementArmyInterval = 0
     }
 
     onBegin() {
         console.log("SendState started");
+        //To send immediate and not wait 1000 ms
+        this.node.sendArmyToTarget()
+
+        this.sendInterval = setInterval(() => {
+            this.node.sendArmyToTarget()
+            this.node.incrementArmy()
+        }, 1000)
     }
 
     onUpdate() {
-        this.node.incrementArmy()
-        this.node.sendArmyToTarget()
+    }
 
+    onEnd() {
+        console.log("SendState ended")
+        clearInterval(this.sendInterval)
     }
 }

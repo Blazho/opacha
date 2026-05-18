@@ -3,9 +3,9 @@ import {IdleState, SendState} from "../scripts/node/NodeStates.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AbstractState, State} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
-import {calculateDistance} from "../scripts/helpers/FHelper.js";
+import {calculateDistance, lerp} from "../scripts/helpers/FHelper.js";
 
-//todo separate structure and render
+//todo separate structure from render
 export class BasicNode {
     public readonly id: string; //for helping find duplicates
     private x: number;
@@ -18,8 +18,10 @@ export class BasicNode {
     private visual: HTMLElement | undefined
     private stateMachine: StateMachine
     private targetNodeFriendly: BasicNode | null
+    private lastTargetedNodeFriendly: BasicNode | null
 
     private states: UniqueSet<AbstractState, "stateName">
+    private lastSendInterval: number;
 
     constructor(id: string,
                 x: number = 50,
@@ -37,6 +39,8 @@ export class BasicNode {
         this.currentArmy = currentArmy;
         // this.maxArmy = maxArmy
         this.targetNodeFriendly = null
+        this.lastTargetedNodeFriendly = null
+        this.lastSendInterval = 0
 
         this.connectedTo = new UniqueSet<BasicNode, "id">("id")
 
@@ -50,7 +54,7 @@ export class BasicNode {
     private initPossibleStates(){
 
         const idleState = new IdleState(this)
-        const sendState = new SendState(this, this.targetNodeFriendly)
+        const sendState = new SendState(this)
 
         this.states.add(idleState)
         this.states.add(sendState)
@@ -80,6 +84,10 @@ export class BasicNode {
 
     public isInsideNode(position: Position): boolean{
         return calculateDistance(this.x, this.y, position.x, position.y) <= this.size
+    }
+
+    public getLastSendInterval() {
+        return this.lastSendInterval
     }
 
     public addConnection(connection: BasicNode): BasicNode{
@@ -115,39 +123,38 @@ export class BasicNode {
         this.currentArmy += value
     }
 
+    public clearTarget(){
+        this.lastTargetedNodeFriendly = this.targetNodeFriendly
+        this.targetNodeFriendly = null
+        //So the last army is sent successfully
+        setTimeout(() => {
+            this.lastTargetedNodeFriendly?.supplyArmy(10) //todo value
+            this.lastTargetedNodeFriendly = null
+        }, 1000 - (Date.now() - this.lastSendInterval))
+    }
+
     public decrementArmy(value: number){
         if(value > this.currentArmy){return;}
         this.currentArmy -= value
     }
 
-    public sendArmyTo(target: BasicNode){
-        if(!this.connectedTo.has(target.id)){
-            console.warn(`Sending army failed.\nTarget node ${target.id} is not connected to ${this.id}`)
-            return
-        }
-        const value = 10 //todo
-        this.decrementArmy(value)
-
-        //todo calc delay of supply over distance
-        const distance = calculateDistance(this.x, this.y, target.x, target.y)
-        setTimeout(() => target.supplyArmy(value), distance)
-    }
-
     public sendArmyToTarget(){
-        if(!this.targetNodeFriendly){
+        if(!this.targetNodeFriendly !&& this.lastTargetedNodeFriendly){
             console.error(`No target specified for node ${this.id}`)
             return
         }
 
         const value = this.currentArmy > 10 ? 10 : this.currentArmy
         this.decrementArmy(value)
+        this.lastSendInterval = Date.now()
 
         //todo calc delay of supply over distance
-        const distance = calculateDistance(this.x, this.y, this.targetNodeFriendly.x, this.targetNodeFriendly.y)
-        setTimeout(() => this.targetNodeFriendly!.supplyArmy(value), distance)
+        // const distance = calculateDistance(this.x, this.y, this.targetNodeFriendly.x, this.targetNodeFriendly.y)
+        // setTimeout(() => this.targetNodeFriendly!.supplyArmy(value), distance)
+        setTimeout(() => this.targetNodeFriendly?.supplyArmy(value), 1000)
     }
 
-    draw(ctx: CanvasRenderingContext2D, selected: boolean = false) {
+    drawNode(ctx: CanvasRenderingContext2D, selected: boolean = false) {
         let circleColor: Pair<string>
         if(selected){
             circleColor = {
@@ -176,5 +183,26 @@ export class BasicNode {
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(this.currentArmy.toString(), this.x, this.y)
+    }
+
+    drawTransfer(ctx: CanvasRenderingContext2D){
+        if(this.targetNodeFriendly){
+            const progress: number = (Date.now() - this.lastSendInterval ) / 1000
+            ctx.beginPath()
+            const currX = lerp(this.x, this.targetNodeFriendly.getX(), progress)
+            const currY = lerp(this.y, this.targetNodeFriendly.getY(), progress)
+            ctx.arc(currX, currY, 10, 0, 2 * Math.PI)
+            ctx.fillStyle = 'red'
+            ctx.fill()
+        }
+        if (this.lastTargetedNodeFriendly){
+            const progress: number = (Date.now() - this.lastSendInterval ) / 1000
+            ctx.beginPath()
+            const currX = lerp(this.x, this.lastTargetedNodeFriendly.getX(), progress)
+            const currY = lerp(this.y, this.lastTargetedNodeFriendly.getY(), progress)
+            ctx.arc(currX, currY, 10, 0, 2 * Math.PI)
+            ctx.fillStyle = 'red'
+            ctx.fill()
+        }
     }
 }

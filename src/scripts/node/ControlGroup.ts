@@ -39,6 +39,7 @@ export class ControlGroup {
         const node = this.findNode(pos)
         if(node){
             node.setState("IdleState")
+            node.clearTarget()
         }
     }
 
@@ -110,7 +111,8 @@ export class ControlGroup {
 
     drawNodes(ctx: CanvasRenderingContext2D) {
         for(const [_, node] of this.groupNodes.entries()){
-            node.draw(ctx, this.selectedNode?.id === node.id)
+            node.drawNode(ctx, this.selectedNode?.id === node.id)
+            node.drawTransfer(ctx)
         }
     }
 }

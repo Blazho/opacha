@@ -1,5 +1,6 @@
 import {BasicNode} from "./prefabs/node.js";
 import {ControlGroup} from "./scripts/node/ControlGroup.js";
+import {PlayerController} from "./scripts/PlayerController.js";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement
 if(canvas){
@@ -18,6 +19,10 @@ if(canvas){
         .addConnection(n2, n3)
 
     group1.printState()
+
+    const playerController = new PlayerController(canvas, group1)
+
+    //draw groups on canvas
     const ctx = canvas.getContext('2d')
     if(ctx){
         setInterval(() => {
@@ -27,34 +32,7 @@ if(canvas){
             group1.update()
             group1.drawAllNonDuplicatesConnections(ctx)
             group1.drawNodes(ctx)
-        }, 200)
-    }
-
-    let clickTimer: number
-
-    canvas.addEventListener('click', (e) =>{
-        clearTimeout(clickTimer)
-        clickTimer = setTimeout(()=>{
-            const pos = getMousePosition(canvas, e)
-            group1.selectNode(pos)
-        }, 250)
-
-    })
-
-    canvas.addEventListener('dblclick', (e) =>{
-        clearTimeout(clickTimer)
-        const pos = getMousePosition(canvas, e)
-        group1.setToIdle(pos)
-    })
-
-
-    function getMousePosition(canvas: HTMLCanvasElement, e: PointerEvent | MouseEvent) {
-        const rect = canvas.getBoundingClientRect();
-
-        return {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        }
+        }, 1000 / 60)
     }
 }
 
