@@ -42,7 +42,7 @@ export class SendState extends AbstractState{
 
     onBegin() {
         console.log("SendState started");
-        //To send immediate and not wait 1000 ms
+        //To send immediate and not wait for delay
         this.node.sendArmyToTarget()
 
         this.sendInterval = setInterval(() => {

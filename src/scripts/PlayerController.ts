@@ -1,4 +1,6 @@
 import {ControlGroup} from "./node/ControlGroup";
+import {BasicNode} from "../prefabs/node";
+import {Event} from "./helpers/CHelper.js";
 
 /**
  * Class responsible for player inputs
@@ -17,14 +19,20 @@ export class PlayerController{
      * - [enemy node] Single attack by all adjacent own nodes
      * **/
 
+    //todo maybe controller should be in control group
+
     private playerGroup: ControlGroup
     private readonly canvas: HTMLCanvasElement
     private clickTimer: number
+    private selectedNode: BasicNode | null;
+
+    onSelectionChanged: Event<BasicNode | null> = new Event()
 
     constructor(canvas: HTMLCanvasElement, group: ControlGroup) {
         this.canvas = canvas;
         this.playerGroup = group
         this.clickTimer = 0
+        this.selectedNode = null
 
         this.setClickEventListener()
         this.setDBClickListener()
@@ -45,9 +53,24 @@ export class PlayerController{
             //So it can be canceled if double-clicked
             this.clickTimer = setTimeout(()=>{
                 const pos = this.getMousePosition(e)
-                this.playerGroup.selectNode(pos)
+                const node = this.playerGroup.findNode(pos)
+                this.processNode(node)
             }, 150)
         })
+    }
+
+    private processNode(node: BasicNode | null){
+            if(this.selectedNode){
+                if(node){
+                    this.selectedNode.setTargetNode(node)
+                }
+                this.selectedNode = null
+            }else {
+                if(node){
+                    this.selectedNode = node
+                    this.onSelectionChanged.emit(node)
+                }
+            }
     }
 
     private setDBClickListener(){

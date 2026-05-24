@@ -3,34 +3,19 @@ import {BasicNode} from "../../prefabs/node.js";
 import {Position} from "../helpers/IHelper";
 
 export class ControlGroup {
-    private name: string
+    private readonly name: string
     private groupNodes: UniqueSet<BasicNode, "id">
-    private selectedNode: BasicNode | null;
+    private color: string;
 
-    constructor(name: string) {
+    constructor(name: string, color: string) {
         this.name = name
+        this.color = color
         this.groupNodes = new UniqueSet<BasicNode, "id">("id")
-        this.selectedNode = null
     }
 
     public addNode(node: BasicNode): ControlGroup {
         this.groupNodes.add(node)
         return this
-    }
-
-    public selectNode(clickPosition: Position){
-        if(this.selectedNode){
-            const targetNode = this.findNode(clickPosition)
-            if(targetNode){
-                this.selectedNode.setTargetNode(targetNode)
-            }
-            this.selectedNode = null
-        }else {
-            const targetNode = this.findNode(clickPosition)
-            if(targetNode){
-                this.selectedNode = targetNode
-            }
-        }
     }
 
     setToIdle(pos: { x: number; y: number; }) {
@@ -41,17 +26,13 @@ export class ControlGroup {
         }
     }
 
-    private findNode(position: Position): BasicNode | null{
+    public findNode(position: Position): BasicNode | null{
         for(const [_, node] of this.groupNodes.entries()){
             if(node.isInsideNode(position)){
                 return node
             }
         }
         return null
-    }
-
-    public clearSelectedNode(){
-        this.selectedNode = null
     }
 
     public removeNode(node: BasicNode): BasicNode {
@@ -92,13 +73,9 @@ export class ControlGroup {
         for(const pair of connections){
             this.drawConnections(ctx, pair[0], pair[1])
         }
-
-
-
     }
 
     private drawConnections(ctx: CanvasRenderingContext2D, n1: BasicNode, n2: BasicNode){
-
         ctx.beginPath();
         ctx.moveTo(n1.getX(), n1.getY()); // Start point
         ctx.lineTo(n2.getX(), n2.getY()); // End point
@@ -109,8 +86,9 @@ export class ControlGroup {
 
     drawNodes(ctx: CanvasRenderingContext2D) {
         for(const [_, node] of this.groupNodes.entries()){
-            node.drawNode(ctx, this.selectedNode?.id === node.id)
-            node.drawTransfer(ctx)
+            node.drawNode(ctx, this.color, false)
+            // node.drawNode(ctx, this.color, this.selectedNode?.id === node.id)
+            node.drawTransfer(ctx, this.color)
         }
     }
 }
