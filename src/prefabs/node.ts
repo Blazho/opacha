@@ -1,9 +1,10 @@
-import {StateMachine} from "../scripts/StateMachine.js";
-import {IdleState, SendState} from "../scripts/node/NodeStates.js";
+import {Predicate, StateMachine} from "../scripts/StateMachine.js";
+import {AttackState, IdleState, SendState, TakeOverState} from "../scripts/node/NodeStates.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AbstractState} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
 import {calculateDistance, lerp} from "../scripts/helpers/FHelper.js";
+import {ControlGroup} from "../scripts/node/ControlGroup";
 
 //todo separate structure from render
 export class BasicNode {
@@ -17,6 +18,8 @@ export class BasicNode {
     private stateMachine: StateMachine
     private targetNode: BasicNode | null
     private lastTargetedNode: BasicNode | null
+    private group: ControlGroup | null
+    isSelected = false //if player selected it
 
     private states: UniqueSet<AbstractState, "stateName">
     private lastSendInterval: number;
@@ -37,11 +40,11 @@ export class BasicNode {
         this.targetNode = null
         this.lastTargetedNode = null
         this.lastSendInterval = 0
+        this.group = null
 
         this.connectedTo = new UniqueSet<BasicNode, "id">("id")
 
         this.stateMachine = new StateMachine()
-        //todo move it to upper layer
         this.states = new UniqueSet<AbstractState, "stateName">("stateName")
         this.initPossibleStates()
 
@@ -52,9 +55,29 @@ export class BasicNode {
 
         const idleState = new IdleState(this)
         const sendState = new SendState(this)
+        const attackState = new AttackState(this)
+        const takeOverState = new TakeOverState(this)
 
+        //todo remove
         this.states.add(idleState)
         this.states.add(sendState)
+        this.states.add(attackState)
+
+        // this.stateMachine.addAnyTransition(takeOverState, new Predicate(() => this.isInTakeOverState()))
+
+        this.stateMachine.addTransition(idleState, sendState, new Predicate(() => {
+            return this.targetNode !== null && this.targetNode.getGroup()?.name === this.group?.name
+        }))
+        this.stateMachine.addTransition(idleState, attackState, new Predicate(() => {
+            return this.targetNode !== null && this.targetNode.getGroup()?.name !== this.group?.name
+        }))
+        this.stateMachine.addTransition(sendState, idleState, new Predicate(() => this.targetNode === null))
+        this.stateMachine.addTransition(attackState, idleState, new Predicate(() => this.targetNode === null))
+        // this.stateMachine.addTransition(takeOverState, idleState, new Predicate(() => !this.isInTakeOverState()))
+    }
+
+    private isInTakeOverState(): boolean{
+        return this.currentArmy < 0
     }
 
     public update() {
@@ -70,7 +93,11 @@ export class BasicNode {
         this.stateMachine.changeState(loadedState)
     }
 
-    public setTargetNode(newTarget: BasicNode){
+    public resetCurrentArmy(){
+        this.currentArmy = 1
+    }
+
+    public setTargetNode(newTarget: BasicNode, isAttackTarget = false){
         if(newTarget === this){
             return;
         }
@@ -79,7 +106,14 @@ export class BasicNode {
             return
         }
         this.targetNode = newTarget
-        this.setState("SendState")
+    }
+
+    public setGroup(newGroup: ControlGroup){
+        this.group = newGroup
+    }
+
+    public clearGroup(){
+        this.group = null
     }
 
     public isInsideNode(position: Position): boolean{
@@ -96,6 +130,7 @@ export class BasicNode {
         return this
     }
 
+    public getGroup(): ControlGroup | null { return this.group}
     public getLastSendInterval() { return this.lastSendInterval }
     public getId() { return this.id; }
     public getX() { return this.x; }
@@ -111,10 +146,12 @@ export class BasicNode {
         this.currentArmy += value
     }
 
+    //todo bugged
     public clearTarget(){
         this.lastTargetedNode = this.targetNode
         this.targetNode = null
         //So the last army is sent successfully
+        //todo move to state logic
         setTimeout(() => {
             this.lastTargetedNode?.supplyArmy(10) //todo value
             this.lastTargetedNode = null
@@ -126,7 +163,35 @@ export class BasicNode {
         this.currentArmy -= value
     }
 
-    public sendArmyToTarget(){
+    public attackTarget(){
+        if(!this.targetNode !&& this.lastTargetedNode){
+            console.error(`No target specified for node ${this.id}`)
+            return
+        }
+
+        const value = this.currentArmy > 10 ? 10 : this.currentArmy
+        this.decrementArmy(value)
+        this.lastSendInterval = Date.now()
+
+        setTimeout(() => {
+            if(this.targetNode)
+            {
+                this.targetNode.supplyArmy(-value)
+                if(this.targetNode.currentArmy < 0 && this.group){
+                    // this.targetNode.group?.giveNodeTo(this, this.group)
+                    // console.log("TUKA",this.targetNode)
+                    this.group.addNode(this.targetNode)
+                    // this.clearTarget()
+
+                }
+            }else if (this.lastTargetedNode){
+                this.lastTargetedNode.supplyArmy(-value)
+            }
+
+        }, 1000)
+    }
+
+    public supplyArmyToTarget(){
         if(!this.targetNode !&& this.lastTargetedNode){
             console.error(`No target specified for node ${this.id}`)
             return
@@ -137,8 +202,6 @@ export class BasicNode {
         this.lastSendInterval = Date.now()
 
         //todo calc delay of supply over distance
-        // const distance = calculateDistance(this.x, this.y, this.targetNode.x, this.targetNode.y)
-        // setTimeout(() => this.targetNode!.supplyArmy(value), distance)
         setTimeout(() => {
             if(this.targetNode)
             {
@@ -147,6 +210,10 @@ export class BasicNode {
                 this.lastTargetedNode.supplyArmy(value)
             }
         }, 1000)
+    }
+
+    toString(){
+        return `${this.id} - ${this.group?.name}`
     }
 
     drawNode(ctx: CanvasRenderingContext2D, color: string, selected: boolean = false) {
@@ -179,6 +246,7 @@ export class BasicNode {
     }
 
     drawTransfer(ctx: CanvasRenderingContext2D, color: string){
+        //todo refactor duplicate
         if(this.targetNode){
             const progress: number = (Date.now() - this.lastSendInterval ) / 1000
             ctx.beginPath()

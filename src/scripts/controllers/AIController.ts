@@ -1,4 +1,4 @@
-import {ControlGroup} from "./node/ControlGroup";
+import {ControlGroup} from "../node/ControlGroup";
 
 export class AIController{
     private controlGroup: ControlGroup

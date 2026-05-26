@@ -14,6 +14,7 @@ export class IdleState extends AbstractState{
     }
 
     onBegin() {
+        this.node.clearTarget()
         this.incrementArmyInterval = setInterval(() => {
             this.node.incrementArmy()
         }, 1000)
@@ -31,22 +32,20 @@ export class SendState extends AbstractState{
     override readonly stateName: string = "SendState";
     private node: BasicNode
     private sendInterval: number
-    private incrementArmyInterval: number
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
         this.sendInterval = 0
-        this.incrementArmyInterval = 0
     }
 
     onBegin() {
         console.log("SendState started");
         //To send immediate and not wait for delay
-        this.node.sendArmyToTarget()
+        this.node.supplyArmyToTarget()
 
         this.sendInterval = setInterval(() => {
-            this.node.sendArmyToTarget()
+            this.node.supplyArmyToTarget()
             this.node.incrementArmy()
         }, 1000)
     }
@@ -58,4 +57,59 @@ export class SendState extends AbstractState{
         console.log("SendState ended")
         clearInterval(this.sendInterval)
     }
+}
+
+export class AttackState extends AbstractState{
+    override readonly stateName: string = "AttackState";
+    private node: BasicNode
+    private sendInterval: number
+
+    constructor(node: BasicNode) {
+        super();
+        this.node = node;
+        this.sendInterval = 0
+    }
+
+    onBegin() {
+        console.log("AttackState started");
+        //To send immediate and not wait for delay
+        this.node.attackTarget()
+
+        this.sendInterval = setInterval(() => {
+            this.node.attackTarget()
+            this.node.incrementArmy()
+        }, 1000)
+    }
+
+    onUpdate() {
+    }
+
+    onEnd() {
+        console.log("AttackState ended")
+        clearInterval(this.sendInterval)
+    }
+}
+
+export class TakeOverState extends AbstractState{
+    override readonly stateName: string = "TakeOverState";
+    private node: BasicNode
+
+    constructor(node: BasicNode) {
+        super();
+        this.node = node;
+    }
+
+    onBegin() {
+        console.log("TakeOverState started");
+        // setTimeout(() => {
+        this.node.resetCurrentArmy()
+        // this.node.setState("IdleState")
+        // }, 5000)
+    }
+
+    onEnd() {
+        console.log("TakeOverState ended");
+        // this.node.resetCurrentArmy()
+    }
+
 }

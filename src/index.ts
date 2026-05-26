@@ -1,6 +1,6 @@
 import {BasicNode} from "./prefabs/node.js";
 import {ControlGroup} from "./scripts/node/ControlGroup.js";
-import {PlayerController} from "./scripts/PlayerController.js";
+import {PlayerController} from "./scripts/controllers/PlayerController.js";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement
 if(canvas){
@@ -17,7 +17,7 @@ if(canvas){
     const ain2 = new BasicNode('ain2', 750, 500)
     const ain3 = new BasicNode('ain3', 1000, 600)
 
-    const aiControlGroup = new ControlGroup('Team2', "red")
+    const aiControlGroup = new ControlGroup('Team2', "green")
 
     aiControlGroup
         .addNode(ain1)
@@ -25,7 +25,7 @@ if(canvas){
         .addNode(ain3)
         .addConnection(ain3, ain1)
         .addConnection(ain3, ain2)
-        .addConnection(pn3, ain2)
+        .addOtherConnection(ain2, pn3)
 
     playerControlGroup
         .addNode(pn1)
@@ -33,7 +33,7 @@ if(canvas){
         .addNode(pn3)
         .addConnection(pn1, pn2)
         .addConnection(pn2, pn3)
-        .addConnection(pn3, ain2)
+        .addOtherConnection(pn3, ain2)
 
 
     //todo refactor

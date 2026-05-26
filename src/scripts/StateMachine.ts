@@ -17,9 +17,7 @@ export class StateMachine{
     private anyTransitions: Set<ITransition> = new Set();
 
     public update(){
-        // console.log("StateMachine update");
         const transition = this.getTransition()
-        // console.log(transition);
         if(transition){
             this.changeState(transition.to)
         }
@@ -44,13 +42,11 @@ export class StateMachine{
         this.current = nextState
     }
     private getTransition(): ITransition | null{
-        // console.log("StateMachine getTransition(): anyTransitions");
         for (const t of this.anyTransitions){
             if(t.condition.check()){
                 return t;
             }
         }
-        // console.log("StateMachine getTransition(): current.transitions");
         if(this.current){
             for (const t of this.current.transitions){
                 if(t.condition.check()){
@@ -58,7 +54,6 @@ export class StateMachine{
                 }
             }
         }
-        // console.log("StateMachine getTransition(): null");
         return null
     }
     public addTransition(from: State, to: State, condition: Predicate) {
@@ -70,7 +65,6 @@ export class StateMachine{
             to: this.getOrAddNode(to).state,
             condition: condition,
         })
-        // console.log("Any transitions", this.anyTransitions)
     }
 
     public getStateName(): string{

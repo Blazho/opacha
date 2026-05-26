@@ -3,41 +3,62 @@ import {BasicNode} from "../../prefabs/node.js";
 import {Position} from "../helpers/IHelper";
 
 export class ControlGroup {
-    private readonly name: string
+    public readonly name: string
+    //controllable nodes
     private groupNodes: UniqueSet<BasicNode, "id">
-    private color: string;
+    //non-controllable nodes
+    private otherNodes: UniqueSet<BasicNode, "id">
+    private readonly color: string;
 
     constructor(name: string, color: string) {
         this.name = name
         this.color = color
         this.groupNodes = new UniqueSet<BasicNode, "id">("id")
+        this.otherNodes = new UniqueSet<BasicNode, "id">("id")
     }
 
+    //Use it only for adding fresh new node
     public addNode(node: BasicNode): ControlGroup {
+        // if (node.getGroup()){
+        //     console.log("Node already has group")
+        //     return this
+        // }
+        node.setGroup(this)
         this.groupNodes.add(node)
         return this
-    }
-
-    setToIdle(pos: { x: number; y: number; }) {
-        const node = this.findNode(pos)
-        if(node){
-            node.setState("IdleState")
-            node.clearTarget()
-        }
     }
 
     public findNode(position: Position): BasicNode | null{
         for(const [_, node] of this.groupNodes.entries()){
             if(node.isInsideNode(position)){
+                console.log("Selected node ", node)
+                return node
+            }
+        }
+
+        for (const [_, node] of this.otherNodes.entries()){
+            if(node.isInsideNode(position)){
+                console.log("Other node found!! ", node)
                 return node
             }
         }
         return null
     }
 
-    public removeNode(node: BasicNode): BasicNode {
-        this.groupNodes.delete(node.id)
+    public takeNode(node: BasicNode): BasicNode {
+        this.groupNodes.add(node)
+        this.otherNodes.delete(node.id)
         return node
+    }
+
+    public giveNodeTo(node: BasicNode, newGroup: ControlGroup) {
+        // console.log("Node :", node, ", newGroup:", newGroup)
+        this.otherNodes.add(node)
+        this.groupNodes.delete(node.id)
+
+        newGroup.takeNode(node)
+        node.setGroup(newGroup)
+        console.log(newGroup)
     }
 
     public addConnection(node1: BasicNode, node2: BasicNode): ControlGroup{
@@ -47,6 +68,24 @@ export class ControlGroup {
         }
         node1.addConnection(node2)
         node2.addConnection(node1)
+        return this
+    }
+
+    public addOtherConnection(contNode: BasicNode, nonContNode: BasicNode): ControlGroup{
+        if(!this.groupNodes.has(contNode.id)){
+            console.log(`Node ${contNode.id} not found in control group ${this.name}.`)
+            return this
+        }
+
+        if (nonContNode === null) {
+            console.log(`Other node is null`)
+            return this
+        }
+
+        this.otherNodes.add(nonContNode)
+        contNode.addConnection(nonContNode)
+        nonContNode.addConnection(contNode)
+        console.log(this)
         return this
     }
 
@@ -86,9 +125,12 @@ export class ControlGroup {
 
     drawNodes(ctx: CanvasRenderingContext2D) {
         for(const [_, node] of this.groupNodes.entries()){
-            node.drawNode(ctx, this.color, false)
-            // node.drawNode(ctx, this.color, this.selectedNode?.id === node.id)
+            node.drawNode(ctx, this.color, node.isSelected)
             node.drawTransfer(ctx, this.color)
         }
+    }
+
+    isAttackTarget(node: BasicNode): boolean {
+        return this.otherNodes.has(node.id)
     }
 }

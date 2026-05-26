@@ -1,6 +1,5 @@
-import {ControlGroup} from "./node/ControlGroup";
-import {BasicNode} from "../prefabs/node";
-import {Event} from "./helpers/CHelper.js";
+import {ControlGroup} from "../node/ControlGroup";
+import {BasicNode} from "../../prefabs/node";
 
 /**
  * Class responsible for player inputs
@@ -26,7 +25,6 @@ export class PlayerController{
     private clickTimer: number
     private selectedNode: BasicNode | null;
 
-    onSelectionChanged: Event<BasicNode | null> = new Event()
 
     constructor(canvas: HTMLCanvasElement, group: ControlGroup) {
         this.canvas = canvas;
@@ -53,22 +51,25 @@ export class PlayerController{
             //So it can be canceled if double-clicked
             this.clickTimer = setTimeout(()=>{
                 const pos = this.getMousePosition(e)
+                //todo bug can select non controllable nodes
                 const node = this.playerGroup.findNode(pos)
                 this.processNode(node)
-            }, 150)
+            }, 250)
         })
     }
 
     private processNode(node: BasicNode | null){
             if(this.selectedNode){
                 if(node){
-                    this.selectedNode.setTargetNode(node)
+                    const isAttackTarget = this.playerGroup.isAttackTarget(node)
+                    this.selectedNode.setTargetNode(node, isAttackTarget)
                 }
+                this.selectedNode.isSelected = false
                 this.selectedNode = null
             }else {
                 if(node){
                     this.selectedNode = node
-                    this.onSelectionChanged.emit(node)
+                    this.selectedNode.isSelected = true
                 }
             }
     }
@@ -77,7 +78,7 @@ export class PlayerController{
         this.canvas.addEventListener('dblclick', (e) =>{
             clearTimeout(this.clickTimer)
             const pos = this.getMousePosition(e)
-            this.playerGroup.setToIdle(pos)
+            this.playerGroup.findNode(pos)?.clearTarget()
         })
     }
 
