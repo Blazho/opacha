@@ -51,8 +51,8 @@ export class PlayerController{
             //So it can be canceled if double-clicked
             this.clickTimer = setTimeout(()=>{
                 const pos = this.getMousePosition(e)
-                //todo bug can select non controllable nodes
-                const node = this.playerGroup.findNode(pos)
+                const checkOther = this.selectedNode != null
+                const node = this.playerGroup.findNode(pos, checkOther)
                 this.processNode(node)
             }, 250)
         })

@@ -28,37 +28,42 @@ export class ControlGroup {
         return this
     }
 
-    public findNode(position: Position): BasicNode | null{
+    public findNode(position: Position, checkOtherNodes = false): BasicNode | null{
         for(const [_, node] of this.groupNodes.entries()){
             if(node.isInsideNode(position)){
                 console.log("Selected node ", node)
                 return node
             }
         }
-
-        for (const [_, node] of this.otherNodes.entries()){
-            if(node.isInsideNode(position)){
-                console.log("Other node found!! ", node)
-                return node
+        if(checkOtherNodes){
+            for (const [_, node] of this.otherNodes.entries()){
+                if(node.isInsideNode(position)){
+                    console.log("Other node found!! ", node)
+                    return node
+                }
             }
         }
         return null
     }
 
-    public takeNode(node: BasicNode): BasicNode {
-        this.groupNodes.add(node)
-        this.otherNodes.delete(node.id)
-        return node
-    }
+    //todo Refactor not optimised
+    private checkOptionalNodes(){
+        this.otherNodes.clear()
+        for (const [_, value] of this.groupNodes.entries()){
+            for (const [_, other] of value.connectedTo.entries()){
+                this.otherNodes.add(other)
+            }
+        }
+        let list = []
+        for(const [_, value] of this.otherNodes.entries()){
+            if(this.groupNodes.has(value.id)){
+                list.push(value.id)
+            }
+        }
 
-    public giveNodeTo(node: BasicNode, newGroup: ControlGroup) {
-        // console.log("Node :", node, ", newGroup:", newGroup)
-        this.otherNodes.add(node)
-        this.groupNodes.delete(node.id)
-
-        newGroup.takeNode(node)
-        node.setGroup(newGroup)
-        console.log(newGroup)
+        list.forEach(r=> {
+            this.otherNodes.delete(r)
+        })
     }
 
     public addConnection(node1: BasicNode, node2: BasicNode): ControlGroup{
@@ -90,6 +95,9 @@ export class ControlGroup {
     }
 
     public update(){
+        if(this.groupNodes.length() === 0){
+            return
+        }
         for(const [_, value] of this.groupNodes.entries()){
             value.update()
         }
@@ -132,5 +140,15 @@ export class ControlGroup {
 
     isAttackTarget(node: BasicNode): boolean {
         return this.otherNodes.has(node.id)
+    }
+
+    takeNode(node: BasicNode) {
+        const nodesGroup = node.getGroup()
+        nodesGroup?.groupNodes.delete(node.id)
+        nodesGroup?.checkOptionalNodes()
+
+        node.setGroup(this)
+        this.groupNodes.add(node)
+        this.checkOptionalNodes()
     }
 }

@@ -1,9 +1,9 @@
 import {Predicate, StateMachine} from "../scripts/StateMachine.js";
-import {AttackState, IdleState, SendState, TakeOverState} from "../scripts/node/NodeStates.js";
+import {AttackState, IdleState, SendState} from "../scripts/node/NodeStates.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AbstractState} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
-import {calculateDistance, lerp} from "../scripts/helpers/FHelper.js";
+import {calculateDistance, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
 import {ControlGroup} from "../scripts/node/ControlGroup";
 
 //todo separate structure from render
@@ -18,6 +18,7 @@ export class BasicNode {
     private stateMachine: StateMachine
     private targetNode: BasicNode | null
     private lastTargetedNode: BasicNode | null
+    //reference to the group it belongs
     private group: ControlGroup | null
     isSelected = false //if player selected it
 
@@ -51,19 +52,25 @@ export class BasicNode {
 
         this.setState("IdleState")
     }
+
+    public getGroup(): ControlGroup | null { return this.group}
+    public getLastSendInterval() { return this.lastSendInterval }
+    public getId() { return this.id; }
+    public getX() { return this.x; }
+    public getY() { return this.y; }
+    public getCurrentArmy() { return this.currentArmy; }
+    public getSize() { return this.size; }
+
     private initPossibleStates(){
 
         const idleState = new IdleState(this)
         const sendState = new SendState(this)
         const attackState = new AttackState(this)
-        const takeOverState = new TakeOverState(this)
 
         //todo remove
         this.states.add(idleState)
         this.states.add(sendState)
         this.states.add(attackState)
-
-        // this.stateMachine.addAnyTransition(takeOverState, new Predicate(() => this.isInTakeOverState()))
 
         this.stateMachine.addTransition(idleState, sendState, new Predicate(() => {
             return this.targetNode !== null && this.targetNode.getGroup()?.name === this.group?.name
@@ -71,13 +78,13 @@ export class BasicNode {
         this.stateMachine.addTransition(idleState, attackState, new Predicate(() => {
             return this.targetNode !== null && this.targetNode.getGroup()?.name !== this.group?.name
         }))
-        this.stateMachine.addTransition(sendState, idleState, new Predicate(() => this.targetNode === null))
+        this.stateMachine.addTransition(sendState, idleState, new Predicate(() => {
+            return this.targetNode === null || this.group?.name !== this.targetNode.group?.name
+        }))
         this.stateMachine.addTransition(attackState, idleState, new Predicate(() => this.targetNode === null))
-        // this.stateMachine.addTransition(takeOverState, idleState, new Predicate(() => !this.isInTakeOverState()))
-    }
-
-    private isInTakeOverState(): boolean{
-        return this.currentArmy < 0
+        this.stateMachine.addTransition(attackState, sendState, new Predicate(() => {
+            return this.targetNode !== null && this.group?.name === this.targetNode.group?.name
+        }))
     }
 
     public update() {
@@ -130,13 +137,7 @@ export class BasicNode {
         return this
     }
 
-    public getGroup(): ControlGroup | null { return this.group}
-    public getLastSendInterval() { return this.lastSendInterval }
-    public getId() { return this.id; }
-    public getX() { return this.x; }
-    public getY() { return this.y; }
-    public getCurrentArmy() { return this.currentArmy; }
-    public getSize() { return this.size; }
+
 
     public incrementArmy(){
         this.currentArmy += this.incArmyCount
@@ -169,7 +170,7 @@ export class BasicNode {
             return
         }
 
-        const value = this.currentArmy > 10 ? 10 : this.currentArmy
+        const value = this.currentArmy
         this.decrementArmy(value)
         this.lastSendInterval = Date.now()
 
@@ -178,16 +179,16 @@ export class BasicNode {
             {
                 this.targetNode.supplyArmy(-value)
                 if(this.targetNode.currentArmy < 0 && this.group){
-                    // this.targetNode.group?.giveNodeTo(this, this.group)
-                    // console.log("TUKA",this.targetNode)
-                    this.group.addNode(this.targetNode)
-                    // this.clearTarget()
-
+                    this.group.takeNode(this.targetNode)
+                    this.targetNode.currentArmy = this.targetNode.currentArmy * -1
                 }
             }else if (this.lastTargetedNode){
                 this.lastTargetedNode.supplyArmy(-value)
+                if(this.lastTargetedNode.currentArmy < 0 && this.group){
+                    this.group.takeNode(this.lastTargetedNode)
+                    this.lastTargetedNode.currentArmy = this.lastTargetedNode.currentArmy * -1
+                }
             }
-
         }, 1000)
     }
 
@@ -197,7 +198,7 @@ export class BasicNode {
             return
         }
 
-        const value = this.currentArmy > 10 ? 10 : this.currentArmy
+        const value = this.currentArmy
         this.decrementArmy(value)
         this.lastSendInterval = Date.now()
 
@@ -223,8 +224,8 @@ export class BasicNode {
         }
         if(selected){
             circleColor = {
-                left: '#2980b9',
-                right: '#3498db'
+                left: lightenColor(color, 40),
+                right: 'black'
             }
         }
 

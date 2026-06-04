@@ -89,27 +89,3 @@ export class AttackState extends AbstractState{
         clearInterval(this.sendInterval)
     }
 }
-
-export class TakeOverState extends AbstractState{
-    override readonly stateName: string = "TakeOverState";
-    private node: BasicNode
-
-    constructor(node: BasicNode) {
-        super();
-        this.node = node;
-    }
-
-    onBegin() {
-        console.log("TakeOverState started");
-        // setTimeout(() => {
-        this.node.resetCurrentArmy()
-        // this.node.setState("IdleState")
-        // }, 5000)
-    }
-
-    onEnd() {
-        console.log("TakeOverState ended");
-        // this.node.resetCurrentArmy()
-    }
-
-}

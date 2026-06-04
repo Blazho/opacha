@@ -5,11 +5,11 @@ import {PlayerController} from "./scripts/controllers/PlayerController.js";
 const canvas = document.getElementById("canvas") as HTMLCanvasElement
 if(canvas){
 
-    const pn1 = new BasicNode('pn1')
+    const pn1 = new BasicNode('pn1', 50, 50, 50, 3)
     const pn2 = new BasicNode('pn2', 1000, 50 , 50, 0, 5)
     const pn3 = new BasicNode('pn3', 300, 100 , 50, 0,30)
 
-    const playerControlGroup = new ControlGroup("Team1", "blue")
+    const playerControlGroup = new ControlGroup("Team1", "#0000ff")
 
     const playerController = new PlayerController(canvas, playerControlGroup)
 
@@ -17,7 +17,10 @@ if(canvas){
     const ain2 = new BasicNode('ain2', 750, 500)
     const ain3 = new BasicNode('ain3', 1000, 600)
 
-    const aiControlGroup = new ControlGroup('Team2', "green")
+    const aiControlGroup = new ControlGroup('Team2', "#00ff00")
+
+    // Uncomment to control the other team
+    // const playerControllerOther = new PlayerController(canvas, aiControlGroup)
 
     aiControlGroup
         .addNode(ain1)
@@ -25,6 +28,7 @@ if(canvas){
         .addNode(ain3)
         .addConnection(ain3, ain1)
         .addConnection(ain3, ain2)
+        .addConnection(ain1, ain2)
         .addOtherConnection(ain2, pn3)
 
     playerControlGroup
@@ -45,11 +49,12 @@ if(canvas){
             ctx.clearRect(0, 0, canvas.width, canvas.height)
 
             aiControlGroup.update()
-            aiControlGroup.drawAllNonDuplicatesConnections(ctx)
-            aiControlGroup.drawNodes(ctx)
-
             playerControlGroup.update()
+
+            aiControlGroup.drawAllNonDuplicatesConnections(ctx)
             playerControlGroup.drawAllNonDuplicatesConnections(ctx)
+
+            aiControlGroup.drawNodes(ctx)
             playerControlGroup.drawNodes(ctx)
         }, 1000 / 60)
     }

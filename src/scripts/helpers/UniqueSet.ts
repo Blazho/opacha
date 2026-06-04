@@ -31,6 +31,14 @@ export class UniqueSet<T, K extends keyof T> {
         return this.items.entries()
     }
 
+    clear(){
+        this.items.clear()
+    }
+
+    length():number {
+        return this.items.size
+    }
+
     public toString(){
         let string = '[UniqueSet]: [\n'
         for(const [key, value] of this.items.entries()) {
