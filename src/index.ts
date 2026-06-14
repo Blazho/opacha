@@ -1,6 +1,8 @@
 import {BasicNode} from "./prefabs/node.js";
 import {ControlGroup} from "./scripts/node/ControlGroup.js";
 import {PlayerController} from "./scripts/controllers/PlayerController.js";
+import {Army} from "./prefabs/Army.js";
+import {Path} from "./prefabs/Path.js";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement
 if(canvas){
@@ -39,14 +41,22 @@ if(canvas){
         .addConnection(pn2, pn3)
         .addOtherConnection(pn3, ain2)
 
+    const path = new Path(pn1, ain1)
+    const army = new Army(pn1, 100, path, 1)
+    const army2 = new Army(ain1, 100, path, 1)
 
     //todo refactor
     //draw groups on canvas
     const ctx = canvas.getContext('2d')
     if(ctx){
         setInterval(() => {
+
+            path.moveArmies()
             //clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+            army.draw(ctx)
+            army2.draw(ctx)
 
             aiControlGroup.update()
             playerControlGroup.update()

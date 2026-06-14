@@ -8,7 +8,7 @@ export class ControlGroup {
     private groupNodes: UniqueSet<BasicNode, "id">
     //non-controllable nodes
     private otherNodes: UniqueSet<BasicNode, "id">
-    private readonly color: string;
+    public readonly color: string;
 
     constructor(name: string, color: string) {
         this.name = name

@@ -9,14 +9,14 @@ import {ControlGroup} from "../scripts/node/ControlGroup";
 //todo separate structure from render
 export class BasicNode {
     public readonly id: string; //for helping find duplicates
-    private x: number;
+    private x: number; //todo use Position
     private y: number;
     private size: number
     private currentArmy: number
     private readonly incArmyCount: number
     public connectedTo : UniqueSet<BasicNode, "id">
     private stateMachine: StateMachine
-    private targetNode: BasicNode | null
+    public targetNode: BasicNode | null
     private lastTargetedNode: BasicNode | null
     //reference to the group it belongs
     private group: ControlGroup | null

@@ -1,3 +1,5 @@
+import {Position} from "./IHelper";
+
 export const calculateDistance = (x1: number, y1: number, x2: number, y2: number): number => {
     return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 };
@@ -37,4 +39,8 @@ function lightenColor(hex: string, percent: number): string {
     };
 
     return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+export function inRadius(pos1: Position, pos2: Position, radius: number): boolean{
+    return calculateDistance(pos1.x, pos1.y, pos2.x, pos2.y) < radius
 }
