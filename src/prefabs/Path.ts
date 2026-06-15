@@ -1,25 +1,47 @@
 import {BasicNode} from "./node.js";
 import {Army} from "./Army.js";
+import {inRadius} from "../scripts/helpers/FHelper.js";
+import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 
 export class Path{
     public node1: BasicNode
     public node2: BasicNode
-    public armies: Army[]
+    public armies: UniqueSet<Army,"originNode">
 
     constructor(node1: BasicNode, node2: BasicNode) {
         this.node1 = node1;
         this.node2 = node2;
-        this.armies = []
+        this.armies = new UniqueSet("originNode")
+    }
+
+    update(){
+        this.moveArmies()
+
+        for(const [_, army] of this.armies.entries()){
+            if(army.count <= 0) continue;
+            for(const [_, otherArmy] of this.armies.entries()){
+                if(army === otherArmy || otherArmy.count <= 0){
+                    continue
+                }
+                if(army.originNode !== otherArmy.originNode && inRadius(army.position, otherArmy.position, 10)){
+                    const value = army.count
+                    army.count -= otherArmy.count
+                    otherArmy.count -= value
+                    console.log(`Collision ${army.count} : ${otherArmy.count}`)
+                    break
+                }
+            }
+        }
+
+        this.removeDeadArmies()
     }
 
     addArmy(newArmy: Army){
-        //todo refactor to use unique set
-        this.armies.push(newArmy)
+        this.armies.add(newArmy)
     }
 
     removeArmy(army: Army){
-        //todo refactor
-        this.armies = this.armies.filter(r=> r !== army)
+        this.armies.delete(army.originNode)
     }
 
     getOtherNode(node: BasicNode){
@@ -32,16 +54,15 @@ export class Path{
     }
 
     moveArmies(){
-        this.removeDeadArmies()
-        this.armies.forEach(r=> r.moveToNextPosition())
+        for(const [_, army] of this.armies.entries()){
+            army.moveToNextPosition()
+        }
     }
 
     private removeDeadArmies(){
-        //todo rework
-        for(let i = this.armies.length-1; i>=0; i--){
-            if(this.armies[i].count < 0){
-                this.removeArmy(this.armies[i])
-                // delete this.armies[i]
+        for(const [_, army] of this.armies.entries()){
+            if(army.count <= 0){
+                this.armies.delete(army.originNode)
             }
         }
     }

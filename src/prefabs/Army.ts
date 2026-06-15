@@ -1,20 +1,19 @@
 import {BasicNode} from "./node";
 import {Position} from "../scripts/helpers/IHelper";
 import {Path} from "./Path";
-import {inRadius} from "../scripts/helpers/FHelper.js";
 
 export class Army{
-    private originNode: BasicNode
-    public count: number
+    private _originNode: BasicNode
+    private _count: number
     private path: Path
-    private position: Position
+    private _position: Position
     private speed: number
 
     constructor(originNode: BasicNode, count: number, path: Path, speed: number) {
-        this.originNode = originNode;
-        this.count = count;
+        this._originNode = originNode;
+        this._count = count;
         this.path = path
-        this.position = { x: originNode.getX(), y:originNode.getY()};
+        this._position = { x: originNode.getX(), y:originNode.getY()};
         this.speed = speed;
 
         path.addArmy(this)
@@ -22,8 +21,8 @@ export class Army{
 
     draw(ctx: CanvasRenderingContext2D){
         ctx.beginPath()
-        ctx.arc(this.position.x, this.position.y, 10, 0, 2 * Math.PI)
-        const group = this.originNode.getGroup()
+        ctx.arc(this._position.x, this._position.y, 10, 0, 2 * Math.PI)
+        const group = this._originNode.getGroup()
         if(group){
             ctx.fillStyle = group.color
         }else {
@@ -33,45 +32,41 @@ export class Army{
     }
 
     nextPosition(): Position{
-        const to = this.path.getOtherNode(this.originNode)
+        const to = this.path.getOtherNode(this._originNode)
         if(!to){
             console.error(`Destination node does not exist`)
             return {x:0, y:0}
         }
 
-        const dx = to.getX() - this.position.x;
-        const dy = to.getY() - this.position.y;
+        const dx = to.getX() - this._position.x;
+        const dy = to.getY() - this._position.y;
 
         length = Math.sqrt(dx*dx + dy*dy);
 
-        const nextX = this.position.x + dx / length * this.speed;
-        const nextY = this.position.y + dy / length * this.speed;
+        const nextX = this._position.x + dx / length * this.speed;
+        const nextY = this._position.y + dy / length * this.speed;
 
         return {x: nextX, y: nextY}
     }
 
-    moveToNextPosition(){
-        this.position = this.nextPosition()
-        let otherArmyCollision = this.checkCollisionOnPath()
-         if(otherArmyCollision){
-             console.log(`Collision between armies happened`)
-             console.log(`${this.count} - ${otherArmyCollision.count} : ${this.count - otherArmyCollision.count}`)
-             const value = this.count
-             this.count -= otherArmyCollision.count
-             otherArmyCollision.count -= value
-
-        }
+    set count(value: number) {
+        this._count = value;
     }
 
-    checkCollisionOnPath(){
-        for (const otherArmy of this.path.armies) {
-            if(otherArmy === this) continue;
+    moveToNextPosition(){
+        this._position = this.nextPosition()
+    }
 
-            if(inRadius(this.position, otherArmy.position, 10)){
-                return otherArmy
-            }
-        }
 
-        return null
+    get originNode(): BasicNode {
+        return this._originNode;
+    }
+
+    get count(): number {
+        return this._count;
+    }
+
+    get position(): Position {
+        return this._position;
     }
 }
