@@ -4,6 +4,7 @@ import {inRadius} from "../scripts/helpers/FHelper.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 
 export class Path{
+    public id: string
     public node1: BasicNode
     public node2: BasicNode
     public armies: UniqueSet<Army,"originNode">
@@ -12,6 +13,7 @@ export class Path{
         this.node1 = node1;
         this.node2 = node2;
         this.armies = new UniqueSet("originNode")
+        this.id = node1.id + "-" + node2.id;
     }
 
     update(){

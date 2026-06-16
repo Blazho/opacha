@@ -1,6 +1,7 @@
 import {UniqueSet} from "../helpers/UniqueSet.js";
 import {BasicNode} from "../../prefabs/node.js";
 import {Position} from "../helpers/IHelper";
+import {Path} from "../../prefabs/Path.js";
 
 export class ControlGroup {
     public readonly name: string
@@ -19,10 +20,10 @@ export class ControlGroup {
 
     //Use it only for adding fresh new node
     public addNode(node: BasicNode): ControlGroup {
-        // if (node.getGroup()){
-        //     console.log("Node already has group")
-        //     return this
-        // }
+        if (node.getGroup()){
+            console.log("Node already has group")
+            return this
+        }
         node.setGroup(this)
         this.groupNodes.add(node)
         return this
@@ -46,24 +47,20 @@ export class ControlGroup {
         return null
     }
 
-    //todo Refactor not optimised
+    //todo not optimised
+    //fixes optional nodes
     private checkOptionalNodes(){
         this.otherNodes.clear()
         for (const [_, value] of this.groupNodes.entries()){
-            for (const [_, other] of value.connectedTo.entries()){
-                this.otherNodes.add(other)
+            for (const [_, path] of value.connectedTo.entries()){
+                if(!this.groupNodes.has(path.node1.id)){
+                    this.otherNodes.add(path.node1)
+                }
+                if(!this.groupNodes.has(path.node2.id)){
+                    this.otherNodes.add(path.node2)
+                }
             }
         }
-        let list = []
-        for(const [_, value] of this.otherNodes.entries()){
-            if(this.groupNodes.has(value.id)){
-                list.push(value.id)
-            }
-        }
-
-        list.forEach(r=> {
-            this.otherNodes.delete(r)
-        })
     }
 
     public addConnection(node1: BasicNode, node2: BasicNode): ControlGroup{
@@ -71,8 +68,10 @@ export class ControlGroup {
             console.log(`Node ${node1.id} and ${node2.id} not found in control group ${this.name}.`)
             return this
         }
-        node1.addConnection(node2)
-        node2.addConnection(node1)
+
+        const path = new Path(node1, node2)
+        node1.addPath(path)
+        node2.addPath(path)
         return this
     }
 
@@ -88,9 +87,9 @@ export class ControlGroup {
         }
 
         this.otherNodes.add(nonContNode)
-        contNode.addConnection(nonContNode)
-        nonContNode.addConnection(contNode)
-        console.log(this)
+        const path = new Path(contNode, nonContNode)
+        contNode.addPath(path)
+        nonContNode.addPath(path)
         return this
     }
 
@@ -107,19 +106,21 @@ export class ControlGroup {
         console.log(`${this.name} nodes: `, this.groupNodes)
     }
 
+    //todo draws duplicates
     public drawAllNonDuplicatesConnections(ctx: CanvasRenderingContext2D){
-        const connections : [BasicNode, BasicNode][] = []
+        // const connections : [BasicNode, BasicNode][] = []
         for(const [_, node] of this.groupNodes.entries()){
             for (const [_, connected] of node.connectedTo.entries()){
-                if(node.id < connected.id){
-                    connections.push([node, connected])
-                }
+                // if(node.id < connected.id){
+                //     connections.push([node, connected])
+                // }
+                this.drawConnections(ctx, connected.node1, connected.node2)
             }
         }
 
-        for(const pair of connections){
-            this.drawConnections(ctx, pair[0], pair[1])
-        }
+        // for(const pair of connections){
+        //     this.drawConnections(ctx, pair[0], pair[1])
+        // }
     }
 
     private drawConnections(ctx: CanvasRenderingContext2D, n1: BasicNode, n2: BasicNode){

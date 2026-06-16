@@ -5,6 +5,7 @@ import {AbstractState} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
 import {calculateDistance, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
 import {ControlGroup} from "../scripts/node/ControlGroup";
+import {Path} from "./Path";
 
 //todo separate structure from render
 export class BasicNode {
@@ -14,7 +15,7 @@ export class BasicNode {
     private size: number
     private currentArmy: number
     private readonly incArmyCount: number
-    public connectedTo : UniqueSet<BasicNode, "id">
+    public connectedTo : UniqueSet<Path, "id">
     private stateMachine: StateMachine
     public targetNode: BasicNode | null
     private lastTargetedNode: BasicNode | null
@@ -43,7 +44,7 @@ export class BasicNode {
         this.lastSendInterval = 0
         this.group = null
 
-        this.connectedTo = new UniqueSet<BasicNode, "id">("id")
+        this.connectedTo = new UniqueSet<Path, "id">("id")
 
         this.stateMachine = new StateMachine()
         this.states = new UniqueSet<AbstractState, "stateName">("stateName")
@@ -108,7 +109,7 @@ export class BasicNode {
         if(newTarget === this){
             return;
         }
-        if(!this.connectedTo.has(newTarget.id)){
+        if(!this.connectedTo.containInAnyKey(newTarget.id)){
             console.error(`Node ${newTarget.id} not connected to selected node ${this.id}`);
             return
         }
@@ -127,17 +128,14 @@ export class BasicNode {
         return calculateDistance(this.x, this.y, position.x, position.y) <= this.size
     }
 
-    public addConnection(connection: BasicNode): BasicNode{
-        this.connectedTo.add(connection);
-        return this
+    public addPath(path: Path){
+        if(path.node1 !== this && path.node2 !== this){
+            console.error(`This node ${this.id} is not on this path`)
+            return
+        }
+
+        this.connectedTo.add(path)
     }
-
-    public removeConnection(connectionId: string): BasicNode{
-        this.connectedTo.delete(connectionId);
-        return this
-    }
-
-
 
     public incrementArmy(){
         this.currentArmy += this.incArmyCount

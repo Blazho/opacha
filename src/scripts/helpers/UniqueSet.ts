@@ -39,6 +39,15 @@ export class UniqueSet<T, K extends keyof T> {
         return this.items.size
     }
 
+    containInAnyKey(value: string): boolean {
+        for(const [key, _] of this.items.entries()) {
+            if((""+key).includes(value.toString())){
+                return true
+            }
+        }
+        return false
+    }
+
     public toString(){
         let string = '[UniqueSet]: [\n'
         for(const [key, value] of this.items.entries()) {
@@ -56,4 +65,3 @@ function isRealObject(val: any): val is object {
         typeof val === 'object'
     );
 }
-
