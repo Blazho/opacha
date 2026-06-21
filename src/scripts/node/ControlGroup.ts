@@ -6,7 +6,7 @@ import {Path} from "../../prefabs/Path.js";
 export class ControlGroup {
     public readonly name: string
     //controllable nodes
-    private groupNodes: UniqueSet<BasicNode, "id">
+    private _groupNodes: UniqueSet<BasicNode, "id">
     //non-controllable nodes
     private otherNodes: UniqueSet<BasicNode, "id">
     public readonly color: string;
@@ -14,7 +14,7 @@ export class ControlGroup {
     constructor(name: string, color: string) {
         this.name = name
         this.color = color
-        this.groupNodes = new UniqueSet<BasicNode, "id">("id")
+        this._groupNodes = new UniqueSet<BasicNode, "id">("id")
         this.otherNodes = new UniqueSet<BasicNode, "id">("id")
     }
 
@@ -25,12 +25,12 @@ export class ControlGroup {
             return this
         }
         node.setGroup(this)
-        this.groupNodes.add(node)
+        this._groupNodes.add(node)
         return this
     }
 
     public findNode(position: Position, checkOtherNodes = false): BasicNode | null{
-        for(const [_, node] of this.groupNodes.entries()){
+        for(const [_, node] of this._groupNodes.entries()){
             if(node.isInsideNode(position)){
                 console.log("Selected node ", node)
                 return node
@@ -48,8 +48,12 @@ export class ControlGroup {
     }
 
 
+    get groupNodes(): UniqueSet<BasicNode, "id"> {
+        return this._groupNodes;
+    }
+
     public addConnection(node1: BasicNode, node2: BasicNode): ControlGroup{
-        if(!this.groupNodes.has(node1.id) || !this.groupNodes.has(node2.id)){
+        if(!this._groupNodes.has(node1.id) || !this._groupNodes.has(node2.id)){
             console.log(`Node ${node1.id} and ${node2.id} not found in control group ${this.name}.`)
             return this
         }
@@ -61,7 +65,7 @@ export class ControlGroup {
     }
 
     public addOtherConnection(contNode: BasicNode, nonContNode: BasicNode): ControlGroup{
-        if(!this.groupNodes.has(contNode.id)){
+        if(!this._groupNodes.has(contNode.id)){
             console.log(`Node ${contNode.id} not found in control group ${this.name}.`)
             return this
         }
@@ -79,22 +83,22 @@ export class ControlGroup {
     }
 
     public update(){
-        if(this.groupNodes.length() === 0){
+        if(this._groupNodes.length() === 0){
             return
         }
-        for(const [_, value] of this.groupNodes.entries()){
+        for(const [_, value] of this._groupNodes.entries()){
             value.update()
         }
     }
 
     public printState(){
-        console.log(`${this.name} nodes: `, this.groupNodes)
+        console.log(`${this.name} nodes: `, this._groupNodes)
     }
 
     //todo draws duplicates
     public drawAllNonDuplicatesConnections(ctx: CanvasRenderingContext2D){
         // const connections : [BasicNode, BasicNode][] = []
-        for(const [_, node] of this.groupNodes.entries()){
+        for(const [_, node] of this._groupNodes.entries()){
             for (const [_, connected] of node.connectedTo.entries()){
                 // if(node.id < connected.id){
                 //     connections.push([node, connected])
@@ -110,13 +114,13 @@ export class ControlGroup {
 
     //todo draws duplicates
     public drawNodesPathsAndArmies(ctx: CanvasRenderingContext2D){
-        for(const [_, node] of this.groupNodes.entries()){
+        for(const [_, node] of this._groupNodes.entries()){
             node.drawPathAndArmies(ctx)
         }
     }
 
     drawNodes(ctx: CanvasRenderingContext2D) {
-        for(const [_, node] of this.groupNodes.entries()){
+        for(const [_, node] of this._groupNodes.entries()){
             node.drawNode(ctx, this.color, node.isSelected)
             node.drawTransfer(ctx, this.color)
         }
@@ -128,11 +132,11 @@ export class ControlGroup {
 
     takeNode(node: BasicNode) {
         const nodesGroup = node.getGroup()
-        nodesGroup?.groupNodes.delete(node.id)
+        nodesGroup?._groupNodes.delete(node.id)
         nodesGroup?.checkOptionalNodes()
 
         node.setGroup(this)
-        this.groupNodes.add(node)
+        this._groupNodes.add(node)
         this.checkOptionalNodes()
     }
 
@@ -140,12 +144,12 @@ export class ControlGroup {
     //fixes optional nodes
     private checkOptionalNodes(){
         this.otherNodes.clear()
-        for (const [_, value] of this.groupNodes.entries()){
+        for (const [_, value] of this._groupNodes.entries()){
             for (const [_, path] of value.connectedTo.entries()){
-                if(!this.groupNodes.has(path.node1.id)){
+                if(!this._groupNodes.has(path.node1.id)){
                     this.otherNodes.add(path.node1)
                 }
-                if(!this.groupNodes.has(path.node2.id)){
+                if(!this._groupNodes.has(path.node2.id)){
                     this.otherNodes.add(path.node2)
                 }
             }

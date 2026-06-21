@@ -61,7 +61,6 @@ export class Path{
                     continue
                 }
                 if(army.group !== otherArmy.group && inRadius(army.position, otherArmy.position, 10)){
-                    console.log(`Collision ${army.count} : ${otherArmy.count}`)
                     const value = army.count
                     army.count -= otherArmy.count
                     otherArmy.count -= value

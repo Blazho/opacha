@@ -3,6 +3,7 @@ import {ControlGroup} from "./scripts/node/ControlGroup.js";
 import {PlayerController} from "./scripts/controllers/PlayerController.js";
 import {Army} from "./prefabs/Army.js";
 import {Path} from "./prefabs/Path.js";
+import {AIController} from "./scripts/controllers/AIController.js";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement
 if(canvas){
@@ -22,7 +23,9 @@ if(canvas){
     const aiControlGroup = new ControlGroup('Team2', "#00ff00")
 
     // Uncomment to control the other team
-    const playerControllerOther = new PlayerController(canvas, aiControlGroup)
+    // const playerControllerOther = new PlayerController(canvas, aiControlGroup)
+
+    const aiController = new AIController(aiControlGroup)
 
     aiControlGroup
         .addNode(ain1)
