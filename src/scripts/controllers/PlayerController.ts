@@ -60,8 +60,7 @@ export class PlayerController{
     private processNode(node: BasicNode | null){
             if(this.selectedNode){
                 if(node){
-                    const isAttackTarget = this.playerGroup.isAttackTarget(node)
-                    this.selectedNode.setTargetNode(node, isAttackTarget)
+                    this.selectedNode.setTargetNode(node)
                 }
                 this.selectedNode.isSelected = false
                 this.selectedNode = null
