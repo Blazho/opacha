@@ -7,9 +7,9 @@ import {Path} from "./prefabs/Path.js";
 const canvas = document.getElementById("canvas") as HTMLCanvasElement
 if(canvas){
 
-    const pn1 = new BasicNode('pn1', 50, 50, 50, 3)
-    const pn2 = new BasicNode('pn2', 1000, 50 , 50, 0, 5)
-    const pn3 = new BasicNode('pn3', 300, 100 , 50, 0,30)
+    const pn1 = new BasicNode('pn1', 50, 50, 50, 1)
+    const pn2 = new BasicNode('pn2', 1000, 50 , 50, 1)
+    const pn3 = new BasicNode('pn3', 300, 100 , 50, 1)
 
     const playerControlGroup = new ControlGroup("Team1", "#0000ff")
 
@@ -22,7 +22,7 @@ if(canvas){
     const aiControlGroup = new ControlGroup('Team2', "#00ff00")
 
     // Uncomment to control the other team
-    // const playerControllerOther = new PlayerController(canvas, aiControlGroup)
+    const playerControllerOther = new PlayerController(canvas, aiControlGroup)
 
     aiControlGroup
         .addNode(ain1)
@@ -41,6 +41,7 @@ if(canvas){
         .addConnection(pn2, pn3)
         .addOtherConnection(pn3, ain2)
 
+
     //todo refactor
     //draw groups on canvas
     const ctx = canvas.getContext('2d')
@@ -53,8 +54,13 @@ if(canvas){
             aiControlGroup.update()
             playerControlGroup.update()
 
-            aiControlGroup.drawAllNonDuplicatesConnections(ctx)
-            playerControlGroup.drawAllNonDuplicatesConnections(ctx)
+            // aiControlGroup.drawAllNonDuplicatesConnections(ctx)
+            // playerControlGroup.drawAllNonDuplicatesConnections(ctx)
+            //
+            // path.draw(ctx)
+
+            playerControlGroup.drawNodesPathsAndArmies(ctx)
+            aiControlGroup.drawNodesPathsAndArmies(ctx)
 
             aiControlGroup.drawNodes(ctx)
             playerControlGroup.drawNodes(ctx)

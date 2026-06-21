@@ -1,20 +1,23 @@
-import {BasicNode} from "./node";
-import {Position} from "../scripts/helpers/IHelper";
-import {Path} from "./Path";
+import {BasicNode} from "./node.js";
+import {Position} from "../scripts/helpers/IHelper.js";
+import {Path} from "./Path.js";
+import {ControlGroup} from "../scripts/node/ControlGroup.js";
 
 export class Army{
-    private _originNode: BasicNode
+    public readonly id: string
+    private readonly _originNode: BasicNode
+    private readonly _controlGroup: ControlGroup
     private _count: number
     private path: Path
     private _position: Position
-    private speed: number
 
-    constructor(originNode: BasicNode, count: number, path: Path, speed: number) {
+    constructor(originNode: BasicNode, count: number, path: Path) {
         this._originNode = originNode;
         this._count = count;
         this.path = path
-        this._position = { x: originNode.getX(), y:originNode.getY()};
-        this.speed = speed;
+        this._position = {x: originNode.getPosition().x, y: originNode.getPosition().y}
+        this._controlGroup = originNode.getGroup() ?? new ControlGroup("Neutral", "gray")
+        this.id = originNode.getId() + Date.now()
 
         path.addArmy(this)
     }
@@ -22,7 +25,7 @@ export class Army{
     draw(ctx: CanvasRenderingContext2D){
         ctx.beginPath()
         ctx.arc(this._position.x, this._position.y, 10, 0, 2 * Math.PI)
-        const group = this._originNode.getGroup()
+        const group = this.group
         if(group){
             ctx.fillStyle = group.color
         }else {
@@ -38,13 +41,13 @@ export class Army{
             return {x:0, y:0}
         }
 
-        const dx = to.getX() - this._position.x;
-        const dy = to.getY() - this._position.y;
+        const dx = to.getPosition().x - this._position.x;
+        const dy = to.getPosition().y - this._position.y;
 
         length = Math.sqrt(dx*dx + dy*dy);
 
-        const nextX = this._position.x + dx / length * this.speed;
-        const nextY = this._position.y + dy / length * this.speed;
+        const nextX = this._position.x + dx / length * this.path.speed;
+        const nextY = this._position.y + dy / length * this.path.speed;
 
         return {x: nextX, y: nextY}
     }
@@ -62,11 +65,21 @@ export class Army{
         return this._originNode;
     }
 
+    get group(): ControlGroup {
+        return this._controlGroup;
+    }
+
     get count(): number {
         return this._count;
     }
 
     get position(): Position {
         return this._position;
+    }
+
+    public static createNewArmy(path: Path, from: BasicNode){
+        const army = new Army(from, from.getCurrentArmy(), path)
+        path.addArmy(army)
+        from.decrementArmy(from.getCurrentArmy())
     }
 }

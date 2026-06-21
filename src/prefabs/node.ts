@@ -3,22 +3,20 @@ import {AttackState, IdleState, SendState} from "../scripts/node/NodeStates.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AbstractState} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
-import {calculateDistance, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
+import { inRadius, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
 import {ControlGroup} from "../scripts/node/ControlGroup";
 import {Path} from "./Path";
 
 //todo separate structure from render
 export class BasicNode {
     public readonly id: string; //for helping find duplicates
-    private x: number; //todo use Position
-    private y: number;
-    private size: number
+    private readonly position: Position
+    private readonly size: number
     private currentArmy: number
     private readonly incArmyCount: number
     public connectedTo : UniqueSet<Path, "id">
     private stateMachine: StateMachine
     public targetNode: BasicNode | null
-    private lastTargetedNode: BasicNode | null
     //reference to the group it belongs
     private group: ControlGroup | null
     isSelected = false //if player selected it
@@ -34,13 +32,11 @@ export class BasicNode {
                 currentArmy: number = 0,
     ) {
         this.id = id
-        this.x = x;
-        this.y = y;
+        this.position = { x: x, y: y}
         this.size = radius;
         this.incArmyCount = incArmyCount;
         this.currentArmy = currentArmy;
         this.targetNode = null
-        this.lastTargetedNode = null
         this.lastSendInterval = 0
         this.group = null
 
@@ -55,42 +51,16 @@ export class BasicNode {
     }
 
     public getGroup(): ControlGroup | null { return this.group}
-    public getLastSendInterval() { return this.lastSendInterval }
     public getId() { return this.id; }
-    public getX() { return this.x; }
-    public getY() { return this.y; }
+    public getPosition() { return this.position}
     public getCurrentArmy() { return this.currentArmy; }
     public getSize() { return this.size; }
 
-    private initPossibleStates(){
-
-        const idleState = new IdleState(this)
-        const sendState = new SendState(this)
-        const attackState = new AttackState(this)
-
-        //todo remove
-        this.states.add(idleState)
-        this.states.add(sendState)
-        this.states.add(attackState)
-
-        this.stateMachine.addTransition(idleState, sendState, new Predicate(() => {
-            return this.targetNode !== null && this.targetNode.getGroup()?.name === this.group?.name
-        }))
-        this.stateMachine.addTransition(idleState, attackState, new Predicate(() => {
-            return this.targetNode !== null && this.targetNode.getGroup()?.name !== this.group?.name
-        }))
-        this.stateMachine.addTransition(sendState, idleState, new Predicate(() => {
-            return this.targetNode === null || this.group?.name !== this.targetNode.group?.name
-        }))
-        this.stateMachine.addTransition(attackState, idleState, new Predicate(() => this.targetNode === null))
-        this.stateMachine.addTransition(attackState, sendState, new Predicate(() => {
-            return this.targetNode !== null && this.group?.name === this.targetNode.group?.name
-        }))
-    }
-
     public update() {
         this.stateMachine.update();
+        this.updatePaths()
     }
+
     //todo find better way instead of string
     public setState(newState: string){
         const loadedState = this.states.get(newState);
@@ -105,7 +75,7 @@ export class BasicNode {
         this.currentArmy = 1
     }
 
-    public setTargetNode(newTarget: BasicNode, isAttackTarget = false){
+    public setTargetNode(newTarget: BasicNode){
         if(newTarget === this){
             return;
         }
@@ -125,7 +95,7 @@ export class BasicNode {
     }
 
     public isInsideNode(position: Position): boolean{
-        return calculateDistance(this.x, this.y, position.x, position.y) <= this.size
+        return inRadius(this.position, position, this.size)
     }
 
     public addPath(path: Path){
@@ -137,6 +107,19 @@ export class BasicNode {
         this.connectedTo.add(path)
     }
 
+    public getPathForTargetNode(){
+        if (!this.targetNode){
+            console.warn("No target node")
+            return null
+        }
+        for(const [_, path] of this.connectedTo.entries()){
+            if(path.node1 === this.targetNode || path.node2 === this.targetNode){
+                return path
+            }
+        }
+        return null
+    }
+
     public incrementArmy(){
         this.currentArmy += this.incArmyCount
     }
@@ -145,70 +128,27 @@ export class BasicNode {
         this.currentArmy += value
     }
 
-    //todo bugged
     public clearTarget(){
-        this.lastTargetedNode = this.targetNode
         this.targetNode = null
-        //So the last army is sent successfully
-        //todo move to state logic
-        setTimeout(() => {
-            this.lastTargetedNode?.supplyArmy(10) //todo value
-            this.lastTargetedNode = null
-        }, 1000 - (Date.now() - this.lastSendInterval))
     }
 
     public decrementArmy(value: number){
-        if(value > this.currentArmy){return;}
+        if(value > this.currentArmy){return false;}
         this.currentArmy -= value
+        return true
     }
-
-    public attackTarget(){
-        if(!this.targetNode !&& this.lastTargetedNode){
-            console.error(`No target specified for node ${this.id}`)
-            return
+    /**
+     * Subtract army form this node and give control to the attacker if the attack army is greater than the army stationed on this node
+     **/
+    public attackNode(attackArmy: number, attackerGroup: ControlGroup){
+        if(this.currentArmy > attackArmy){
+            this.currentArmy -= attackArmy
+        }else {
+            this.currentArmy = Math.abs(this.currentArmy - attackArmy)
+            attackerGroup.takeNode(this)
+            this.setState("IdleState")
+            this.clearTarget()
         }
-
-        const value = this.currentArmy
-        this.decrementArmy(value)
-        this.lastSendInterval = Date.now()
-
-        setTimeout(() => {
-            if(this.targetNode)
-            {
-                this.targetNode.supplyArmy(-value)
-                if(this.targetNode.currentArmy < 0 && this.group){
-                    this.group.takeNode(this.targetNode)
-                    this.targetNode.currentArmy = this.targetNode.currentArmy * -1
-                }
-            }else if (this.lastTargetedNode){
-                this.lastTargetedNode.supplyArmy(-value)
-                if(this.lastTargetedNode.currentArmy < 0 && this.group){
-                    this.group.takeNode(this.lastTargetedNode)
-                    this.lastTargetedNode.currentArmy = this.lastTargetedNode.currentArmy * -1
-                }
-            }
-        }, 1000)
-    }
-
-    public supplyArmyToTarget(){
-        if(!this.targetNode !&& this.lastTargetedNode){
-            console.error(`No target specified for node ${this.id}`)
-            return
-        }
-
-        const value = this.currentArmy
-        this.decrementArmy(value)
-        this.lastSendInterval = Date.now()
-
-        //todo calc delay of supply over distance
-        setTimeout(() => {
-            if(this.targetNode)
-            {
-                this.targetNode.supplyArmy(value)
-            }else if (this.lastTargetedNode){
-                this.lastTargetedNode.supplyArmy(value)
-            }
-        }, 1000)
     }
 
     toString(){
@@ -229,7 +169,7 @@ export class BasicNode {
 
         // Draw circle
         ctx.beginPath()
-        ctx.arc(this.x, this.y, this.size, 0 , 2 * Math.PI)
+        ctx.arc(this.position.x, this.position.y, this.size, 0 , 2 * Math.PI)
         ctx.fillStyle = circleColor.left; // Circle fill color
         ctx.fill();
         ctx.lineWidth = 2;
@@ -241,28 +181,56 @@ export class BasicNode {
         ctx.fillStyle = this.stateMachine.getStateName() === "IdleState" ? "white" : "red";
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText(this.currentArmy.toString(), this.x, this.y)
+        ctx.fillText(this.currentArmy.toString(), this.position.x, this.position.y)
     }
 
     drawTransfer(ctx: CanvasRenderingContext2D, color: string){
-        //todo refactor duplicate
         if(this.targetNode){
             const progress: number = (Date.now() - this.lastSendInterval ) / 1000
             ctx.beginPath()
-            const currX = lerp(this.x, this.targetNode.getX(), progress)
-            const currY = lerp(this.y, this.targetNode.getY(), progress)
+            const currX = lerp(this.position.x, this.targetNode.position.x, progress)
+            const currY = lerp(this.position.y, this.targetNode.position.y, progress)
             ctx.arc(currX, currY, 10, 0, 2 * Math.PI)
             ctx.fillStyle = color
             ctx.fill()
         }
-        if (this.lastTargetedNode){
-            const progress: number = (Date.now() - this.lastSendInterval ) / 1000
-            ctx.beginPath()
-            const currX = lerp(this.x, this.lastTargetedNode.getX(), progress)
-            const currY = lerp(this.y, this.lastTargetedNode.getY(), progress)
-            ctx.arc(currX, currY, 10, 0, 2 * Math.PI)
-            ctx.fillStyle = color
-            ctx.fill()
+    }
+
+    drawPathAndArmies(ctx: CanvasRenderingContext2D){
+        for(const [_, path] of this.connectedTo.entries()){
+            path.draw(ctx)
         }
+    }
+
+    private updatePaths(){
+        for(const [_, path] of this.connectedTo.entries()){
+            path.update()
+        }
+    }
+
+    private initPossibleStates(){
+
+        const idleState = new IdleState(this)
+        const sendState = new SendState(this)
+        const attackState = new AttackState(this)
+
+        //todo refactor if possible
+        this.states.add(idleState)
+        this.states.add(sendState)
+        this.states.add(attackState)
+
+        this.stateMachine.addTransition(idleState, sendState, new Predicate(() => {
+            return this.targetNode !== null && this.targetNode.getGroup()?.name === this.group?.name
+        }))
+        this.stateMachine.addTransition(idleState, attackState, new Predicate(() => {
+            return this.targetNode !== null && this.targetNode.getGroup()?.name !== this.group?.name
+        }))
+        this.stateMachine.addTransition(sendState, idleState, new Predicate(() => {
+            return this.targetNode === null || this.group?.name !== this.targetNode.group?.name
+        }))
+        this.stateMachine.addTransition(attackState, idleState, new Predicate(() => this.targetNode === null))
+        this.stateMachine.addTransition(attackState, sendState, new Predicate(() => {
+            return this.targetNode !== null && this.group?.name === this.targetNode.group?.name
+        }))
     }
 }

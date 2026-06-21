@@ -5,21 +5,24 @@
 
 - [ ] Working demo
 - [ ] AI controller
-- [x] findNodefindNode::ControlGroup - it is allowed to select other nodes
+- [x] findNode::ControlGroup - it is allowed to select other nodes
 - [x] Take node from enemy
 - [ ] checkOptionalNodes::ControlGroup - optimise
-- [ ] Enemy armies does not collide with each other
+- [x] Enemy armies does not collide with each other
 - [ ] Endgame screen
+- [ ] Optimize army logic
+- [ ] Optimize draw paths
 
 ## Bugs
 
 ## Optional
 
-- [ ] Implementation: Attacking should send physical attack circle and not only visual 
+- [x] Implementation: Attacking should send physical attack circle and not only visual 
 - [ ] Render system
 - [ ] Change speed of the game or pause
 - [ ] More type of nodes
-- [ ] Path mechanics
+- [x] Path mechanics
+- [ ] Optimize num.1
 
 -----------------------------
 ### Code styles

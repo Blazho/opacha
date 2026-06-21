@@ -41,21 +41,7 @@ export class StateMachine{
 
         this.current = nextState
     }
-    private getTransition(): ITransition | null{
-        for (const t of this.anyTransitions){
-            if(t.condition.check()){
-                return t;
-            }
-        }
-        if(this.current){
-            for (const t of this.current.transitions){
-                if(t.condition.check()){
-                    return t;
-                }
-            }
-        }
-        return null
-    }
+
     public addTransition(from: State, to: State, condition: Predicate) {
         this.getOrAddNode(from).addTransition(this.getOrAddNode(to).state, condition)
     }
@@ -80,6 +66,22 @@ export class StateMachine{
         const newNode = new StateNode(state)
         this.stateMap.set(state.constructor.name, newNode);
         return newNode;
+    }
+
+    private getTransition(): ITransition | null{
+        for (const t of this.anyTransitions){
+            if(t.condition.check()){
+                return t;
+            }
+        }
+        if(this.current){
+            for (const t of this.current.transitions){
+                if(t.condition.check()){
+                    return t;
+                }
+            }
+        }
+        return null
     }
 }
 

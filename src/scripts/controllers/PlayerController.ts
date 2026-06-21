@@ -18,7 +18,6 @@ export class PlayerController{
      * - [enemy node] Single attack by all adjacent own nodes
      * **/
 
-    //todo maybe controller should be in control group
 
     private playerGroup: ControlGroup
     private readonly canvas: HTMLCanvasElement

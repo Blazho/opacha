@@ -47,21 +47,6 @@ export class ControlGroup {
         return null
     }
 
-    //todo not optimised
-    //fixes optional nodes
-    private checkOptionalNodes(){
-        this.otherNodes.clear()
-        for (const [_, value] of this.groupNodes.entries()){
-            for (const [_, path] of value.connectedTo.entries()){
-                if(!this.groupNodes.has(path.node1.id)){
-                    this.otherNodes.add(path.node1)
-                }
-                if(!this.groupNodes.has(path.node2.id)){
-                    this.otherNodes.add(path.node2)
-                }
-            }
-        }
-    }
 
     public addConnection(node1: BasicNode, node2: BasicNode): ControlGroup{
         if(!this.groupNodes.has(node1.id) || !this.groupNodes.has(node2.id)){
@@ -123,13 +108,11 @@ export class ControlGroup {
         // }
     }
 
-    private drawConnections(ctx: CanvasRenderingContext2D, n1: BasicNode, n2: BasicNode){
-        ctx.beginPath();
-        ctx.moveTo(n1.getX(), n1.getY()); // Start point
-        ctx.lineTo(n2.getX(), n2.getY()); // End point
-        ctx.strokeStyle = 'black';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+    //todo draws duplicates
+    public drawNodesPathsAndArmies(ctx: CanvasRenderingContext2D){
+        for(const [_, node] of this.groupNodes.entries()){
+            node.drawPathAndArmies(ctx)
+        }
     }
 
     drawNodes(ctx: CanvasRenderingContext2D) {
@@ -151,5 +134,30 @@ export class ControlGroup {
         node.setGroup(this)
         this.groupNodes.add(node)
         this.checkOptionalNodes()
+    }
+
+    //todo not optimised
+    //fixes optional nodes
+    private checkOptionalNodes(){
+        this.otherNodes.clear()
+        for (const [_, value] of this.groupNodes.entries()){
+            for (const [_, path] of value.connectedTo.entries()){
+                if(!this.groupNodes.has(path.node1.id)){
+                    this.otherNodes.add(path.node1)
+                }
+                if(!this.groupNodes.has(path.node2.id)){
+                    this.otherNodes.add(path.node2)
+                }
+            }
+        }
+    }
+
+    private drawConnections(ctx: CanvasRenderingContext2D, n1: BasicNode, n2: BasicNode){
+        ctx.beginPath();
+        ctx.moveTo(n1.getPosition().x, n1.getPosition().y); // Start point
+        ctx.lineTo(n2.getPosition().x, n2.getPosition().y); // End point
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.stroke();
     }
 }
