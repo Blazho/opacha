@@ -13,8 +13,15 @@
 - [ ] Optimize army logic
 - [ ] Optimize draw paths
 - [ ] UI
+- [ ] AI node should not supply if is connected to enemy node
+- [ ] Map creation tool
+- [ ] Main menu
+- [ ] Armies should have count on top of them
 
 ## Bugs
+- [ ] Selected node indicator broken
+- [ ] Nodes current army is not shown
+- [ ] Taking nodes should reset the increment of the army
 
 ## Optional
 

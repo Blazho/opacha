@@ -27,9 +27,9 @@ export class BasicNode {
     constructor(id: string,
                 x: number = 50,
                 y: number = 50,
-                radius: number = 50,
                 incArmyCount: number = 1,
                 currentArmy: number = 0,
+                radius: number = 50,
     ) {
         this.id = id
         this.position = { x: x, y: y}
