@@ -4,7 +4,7 @@
 ## Tasks
 
 - [ ] Working demo
-- [ ] AI controller
+- [x] AI controller
 - [x] findNode::ControlGroup - it is allowed to select other nodes
 - [x] Take node from enemy
 - [ ] checkOptionalNodes::ControlGroup - optimise
@@ -12,6 +12,7 @@
 - [ ] Endgame screen
 - [ ] Optimize army logic
 - [ ] Optimize draw paths
+- [ ] UI
 
 ## Bugs
 
