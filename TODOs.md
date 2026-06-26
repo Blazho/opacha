@@ -21,7 +21,7 @@
 ## Bugs
 - [ ] Selected node indicator broken
 - [ ] Nodes current army is not shown
-- [ ] Taking nodes should reset the increment of the army
+- [x] Taking nodes should reset the increment of the army
 
 ## Optional
 

@@ -13,7 +13,7 @@ export class BasicNode {
     private readonly position: Position
     private readonly size: number
     private currentArmy: number
-    private readonly incArmyCount: number
+    private incArmyCount: number
     public connectedTo : UniqueSet<Path, "id">
     private stateMachine: StateMachine
     public targetNode: BasicNode | null
@@ -146,6 +146,7 @@ export class BasicNode {
         }else {
             this.currentArmy = Math.abs(this.currentArmy - attackArmy)
             attackerGroup.takeNode(this)
+            this.incArmyCount = 1
             this.setState("IdleState")
             this.clearTarget()
         }

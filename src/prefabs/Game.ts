@@ -51,17 +51,17 @@ export class Game{
         console.log("load test level called")
         const pn1 = new BasicNode("pn1", 100, 100, 1, 20)
 
-        const nn1 = new BasicNode("nn1", 300, 100, 1, 10)
-        const nn2 = new BasicNode("nn2", 100, 250, 1, 10)
-        const nn3 = new BasicNode("nn3", 300, 250, 1, 10)
-        const nn4 = new BasicNode("nn4", 500, 400, 1, 10)
+        const nn1 = new BasicNode("nn1", 300, 100, 0, 10)
+        const nn2 = new BasicNode("nn2", 100, 250, 0, 10)
+        const nn3 = new BasicNode("nn3", 300, 250, 0, 10)
+        const nn4 = new BasicNode("nn4", 500, 400, 0, 10)
 
-        const nn5 = new BasicNode("nn5", 600, 500, 1, 10)
+        const nn5 = new BasicNode("nn5", 600, 500, 0, 10)
 
-        const nn6 = new BasicNode("nn6", 700, 600, 1, 10)
-        const nn7 = new BasicNode("nn7", 900, 750, 1, 10)
-        const nn8 = new BasicNode("nn8", 1100, 750, 1, 10)
-        const nn9 = new BasicNode("nn9", 900, 900, 1, 10)
+        const nn6 = new BasicNode("nn6", 700, 600, 0, 10)
+        const nn7 = new BasicNode("nn7", 900, 750, 0, 10)
+        const nn8 = new BasicNode("nn8", 1100, 750, 0, 10)
+        const nn9 = new BasicNode("nn9", 900, 900, 0, 10)
 
         const ain1 = new BasicNode("ain1", 1100, 900, 1, 20)
         //init control groups
