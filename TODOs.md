@@ -13,15 +13,17 @@
 - [ ] Optimize army logic
 - [ ] Optimize draw paths
 - [ ] UI
-- [ ] AI node should not supply if is connected to enemy node
+- [ ] AI fix
+* - [ ] Should not supply if is connected to enemy node
 - [ ] Map creation tool
 - [ ] Main menu
-- [ ] Armies should have count on top of them
+- [x] Armies should have count on top of them
 
 ## Bugs
-- [ ] Selected node indicator broken
-- [ ] Nodes current army is not shown
+- [x] Selected node indicator broken
+- [x] Nodes current army is not shown
 - [x] Taking nodes should reset the increment of the army
+- [ ] Cant directly change target when the node is already sending
 
 ## Optional
 

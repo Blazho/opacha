@@ -10,6 +10,7 @@ export const lerp = (start: number, end: number, t: number): number => {
 
 export /**
  * Lightens a hex color dynamically by a given percentage.
+ * It does not work with color names (e.g., "blue" or "red")
  * @param hex - The input hex color string (e.g., "#3498db" or "3498db")
  * @param percent - Percentage to lighten by (0 to 100)
  */

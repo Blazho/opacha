@@ -161,7 +161,7 @@ export class BasicNode {
             left: color,
             right: 'black'
         }
-        if(selected){
+        if(this.isSelected){
             circleColor = {
                 left: lightenColor(color, 40),
                 right: 'black'

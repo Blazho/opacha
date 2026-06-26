@@ -32,6 +32,13 @@ export class Army{
             ctx.fillStyle = "gray"
         }
         ctx.fill()
+
+        // Draw text
+        ctx.font = '16px Verdana';
+        ctx.fillStyle = "black";
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(this.count.toString(), this.position.x, this.position.y - 20)
     }
 
     nextPosition(): Position{

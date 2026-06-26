@@ -42,13 +42,11 @@ export class Game{
     }
 
     public init(){
-        console.log("Init called")
         this.initCanvas()
         this.initMenu()
     }
 
     public loadTestLevel(){
-        console.log("load test level called")
         const pn1 = new BasicNode("pn1", 100, 100, 1, 20)
 
         const nn1 = new BasicNode("nn1", 300, 100, 0, 10)
@@ -65,9 +63,9 @@ export class Game{
 
         const ain1 = new BasicNode("ain1", 1100, 900, 1, 20)
         //init control groups
-        const neutralControlGroup = new ControlGroup("Neutral", "gray")
-        const playerControlGroup = new ControlGroup("Player", "blue")
-        const aiControlGroup = new ControlGroup("AIGroup", "red")
+        const neutralControlGroup = new ControlGroup("Neutral", "#6E6E6EFF")
+        const playerControlGroup = new ControlGroup("Player", "#0000ff")
+        const aiControlGroup = new ControlGroup("AIGroup", "#FFA500")
 
         //add nodes to groups
         playerControlGroup
@@ -118,12 +116,12 @@ export class Game{
         ]
 
         Game.controllers.push(new AIController(aiControlGroup, 5000))
+        // Game.controllers.push(new AIController(playerControlGroup, 5000))
         Game.controllers.push(new PlayerController(Game.canvas, playerControlGroup))
 
     }
 
     public render(){
-        console.log("Render started")
         if(!Game.context){
             console.error("Canvas context is " + Game.context)
             return

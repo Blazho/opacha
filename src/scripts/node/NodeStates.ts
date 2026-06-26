@@ -105,5 +105,6 @@ export class AttackState extends AbstractState{
     onEnd() {
         console.log("AttackState ended")
         clearInterval(this.sendInterval)
+        clearInterval(this.incrementArmyInterval)
     }
 }

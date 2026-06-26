@@ -18,19 +18,23 @@ export class AIController{
     private process(){
         for(const [aiKey, aiNode] of this.controlGroup.groupNodes.entries()){
             let target : BasicNode | undefined
-            let minArmy = Number.MAX_SAFE_INTEGER
 
             let friendlyTarget: BasicNode | undefined
             let maxConnections = aiNode.connectedTo.length()
             for(const [conKey, conPath] of aiNode.connectedTo.entries()){
                 const otherNode = conPath.getOtherNode(aiNode)
-                if(otherNode && otherNode.getGroup() !== this.controlGroup && otherNode.getCurrentArmy() + 5 < aiNode.getCurrentArmy() && otherNode.getCurrentArmy() < minArmy ) //threshold
-                {
-                    console.log(`New target ${otherNode} Old target ${target}`)
-                    minArmy = otherNode.getCurrentArmy()
-                    target = otherNode
+                if(otherNode && otherNode.getGroup() !== this.controlGroup){
+                    this.clearAttackTarget(aiNode)
+                    if(otherNode.getCurrentArmy() + 5 < aiNode.getCurrentArmy()) //threshold for incrementing node's army
+                    {
+                        target = otherNode
+                        continue
+                    }
+
                 }
-                if(otherNode && otherNode.getGroup() === this.controlGroup && otherNode.connectedTo.length() > maxConnections && target ===undefined){
+
+                if(!target && otherNode && otherNode.getGroup() === this.controlGroup
+                    && otherNode.connectedTo.length() >= maxConnections){
                     maxConnections = otherNode.connectedTo.length()
                     friendlyTarget = otherNode
                 }

@@ -121,7 +121,7 @@ export class ControlGroup {
 
     drawNodes(ctx: CanvasRenderingContext2D) {
         for(const [_, node] of this._groupNodes.entries()){
-            node.drawNode(ctx, this.color, node.isSelected)
+            node.drawNode(ctx, this.color)
             node.drawTransfer(ctx, this.color)
         }
     }
