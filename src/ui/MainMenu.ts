@@ -1,22 +1,28 @@
 import {Button} from "./Button.js";
-import {Position} from "../scripts/helpers/IHelper";
+import {Position} from "../scripts/helpers/IHelper.js";
+import {Game} from "../prefabs/Game.js";
 
 export class MainMenu{
     private buttons:Button[];
     private canvas : HTMLCanvasElement;
+    private readonly game: Game
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, game: Game) {
         this.buttons = []
         this.canvas  = canvas;
+        this.game = game
     }
 
     public load(){
         console.log("Loading...");
         this.addClickEventListener()
         this.buttons.push(new Button(
-            "Test button",
+            "Load test game",
             100, 50,
-            () => { console.log("Test button clicked"); },
+            () => {
+                this.game.loadTestLevel()
+                this.game.render()
+            },
             { x: this.canvas.width / 2, y: 100 }
             ))
 

@@ -2,6 +2,7 @@ import {BasicNode} from "./node.js";
 import {ControlGroup} from "../scripts/node/ControlGroup.js";
 import {PlayerController} from "../scripts/controllers/PlayerController.js";
 import {AIController} from "../scripts/controllers/AIController.js";
+import {MainMenu} from "../ui/MainMenu.js";
 
 export class Game{
     private static instance: Game
@@ -11,6 +12,7 @@ export class Game{
     private static groups: ControlGroup[]
     private static interval: number
     private static controllers: any[]
+    private static mainMenu: MainMenu
 
     private constructor() {
     }
@@ -42,6 +44,7 @@ export class Game{
     }
 
     public init(){
+        console.log("Init called")
         this.initCanvas()
         this.initMenu()
     }
@@ -169,5 +172,8 @@ export class Game{
 
     private initMenu(){
         //todo
+        console.log("Loading menu")
+        Game.mainMenu = new MainMenu(Game.canvas, Game.instance)
+        Game.mainMenu.load()
     }
 }
