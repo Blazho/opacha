@@ -35,6 +35,11 @@ export class PlayerController{
         this.setDBClickListener()
     }
 
+    public clearCanvasEvents(){
+        this.clearClickEventListener()
+        this.clearDBClickListener()
+    }
+
     private getMousePosition(e: PointerEvent | MouseEvent) {
         const rect = this.canvas.getBoundingClientRect();
 
@@ -45,16 +50,22 @@ export class PlayerController{
     }
 
     private setClickEventListener(){
-        this.canvas.addEventListener('click', (e) =>{
-            clearTimeout(this.clickTimer)
-            //So it can be canceled if double-clicked
-            this.clickTimer = setTimeout(()=>{
-                const pos = this.getMousePosition(e)
-                const checkOther = this.selectedNode != null
-                const node = this.playerGroup.findNode(pos, checkOther)
-                this.processNode(node)
-            }, 250)
-        })
+        this.canvas.addEventListener('click', this.clickHandler);
+    }
+
+    private clearClickEventListener(){
+        this.canvas.removeEventListener('click', this.clickHandler);
+    }
+
+    private clickHandler = (e: PointerEvent) => {
+        clearTimeout(this.clickTimer)
+        //So it can be canceled if double-clicked
+        this.clickTimer = setTimeout(()=>{
+            const pos = this.getMousePosition(e)
+            const checkOther = this.selectedNode != null
+            const node = this.playerGroup.findNode(pos, checkOther)
+            this.processNode(node)
+        }, 250)
     }
 
     private processNode(node: BasicNode | null){
@@ -73,11 +84,17 @@ export class PlayerController{
     }
 
     private setDBClickListener(){
-        this.canvas.addEventListener('dblclick', (e) =>{
-            clearTimeout(this.clickTimer)
-            const pos = this.getMousePosition(e)
-            this.playerGroup.findNode(pos)?.clearTarget()
-        })
+        this.canvas.addEventListener('dblclick', this.dblClickHandler)
+    }
+
+    private clearDBClickListener(){
+        this.canvas.removeEventListener('dblclick', this.dblClickHandler)
+    }
+
+    private dblClickHandler = (e: MouseEvent) => {
+        clearTimeout(this.clickTimer)
+        const pos = this.getMousePosition(e)
+        this.playerGroup.findNode(pos)?.clearTarget()
     }
 
 }
