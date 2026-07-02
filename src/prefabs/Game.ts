@@ -44,7 +44,7 @@ export class Game{
     }
 
     public init(){
-        console.log("Init called")
+        console.log("Game initiating")
         this.initCanvas()
         this.initMenu()
     }
@@ -171,7 +171,6 @@ export class Game{
     }
 
     private initMenu(){
-        //todo
         console.log("Loading menu")
         Game.mainMenu = new MainMenu(Game.canvas, Game.instance)
         Game.mainMenu.load()

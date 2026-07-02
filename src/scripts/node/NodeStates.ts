@@ -43,7 +43,6 @@ export class SendState extends AbstractState{
     }
 
     onBegin() {
-        console.log("SendState started");
         this.incrementArmyInterval = setInterval(() => {
             this.node.incrementArmy()
         }, 1000)
@@ -63,7 +62,6 @@ export class SendState extends AbstractState{
     }
 
     onEnd() {
-        console.log("SendState ended")
         clearInterval(this.sendInterval)
         clearInterval(this.incrementArmyInterval)
     }
@@ -83,7 +81,6 @@ export class AttackState extends AbstractState{
     }
 
     onBegin() {
-        console.log("AttackState started");
         this.incrementArmyInterval = setInterval(() => {
             this.node.incrementArmy()
         }, 1000)
@@ -103,7 +100,6 @@ export class AttackState extends AbstractState{
     }
 
     onEnd() {
-        console.log("AttackState ended")
         clearInterval(this.sendInterval)
         clearInterval(this.incrementArmyInterval)
     }

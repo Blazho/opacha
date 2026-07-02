@@ -20,7 +20,7 @@ export class Button{
         return this._position;
     }
 
-    constructor(text: string, width: number, height: number, func: () => void, position: Position) {
+    constructor(text: string, width: number, height: number, position: Position, func: () => void) {
         this.text = text;
         this._width = width;
         this._height = height;

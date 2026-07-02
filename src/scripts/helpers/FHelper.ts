@@ -45,3 +45,12 @@ function lightenColor(hex: string, percent: number): string {
 export function inRadius(pos1: Position, pos2: Position, radius: number): boolean{
     return calculateDistance(pos1.x, pos1.y, pos2.x, pos2.y) < radius
 }
+
+export function getMousePosition(e: PointerEvent | MouseEvent, canvas: HTMLCanvasElement) {
+    const rect = canvas.getBoundingClientRect();
+
+    return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+    }
+}

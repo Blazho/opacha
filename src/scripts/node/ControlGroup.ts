@@ -32,14 +32,12 @@ export class ControlGroup {
     public findNode(position: Position, checkOtherNodes = false): BasicNode | null{
         for(const [_, node] of this._groupNodes.entries()){
             if(node.isInsideNode(position)){
-                console.log("Selected node ", node)
                 return node
             }
         }
         if(checkOtherNodes){
             for (const [_, node] of this.otherNodes.entries()){
                 if(node.isInsideNode(position)){
-                    console.log("Other node found!! ", node)
                     return node
                 }
             }

@@ -16,7 +16,7 @@
 - [ ] AI fix
 * - [ ] Should not supply if is connected to enemy node
 - [ ] Map creation tool
-- [ ] Main menu
+- [x] Main menu
 - [x] Armies should have count on top of them
 
 ## Bugs
@@ -33,6 +33,7 @@
 - [ ] More type of nodes
 - [x] Path mechanics
 - [ ] Optimize num.1
+- [ ] Main menu is singleton
 
 -----------------------------
 ### Code styles
