@@ -1,6 +1,7 @@
 import {AbstractState} from "../FiniteStateScript.js";
 import {BasicNode} from "../../prefabs/node.js";
 import {Army} from "../../prefabs/Army.js";
+import {Path} from "../../prefabs/Path.js";
 
 
 export class IdleState extends AbstractState{
@@ -34,12 +35,14 @@ export class SendState extends AbstractState{
     private node: BasicNode
     private sendInterval: number
     private incrementArmyInterval: number
+    private path: Path | null
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
         this.sendInterval = 0
         this.incrementArmyInterval = 0
+        this.path = null
     }
 
     onBegin() {
@@ -47,18 +50,25 @@ export class SendState extends AbstractState{
             this.node.incrementArmy()
         }, 1000)
 
-        const path = this.node.getPathForTargetNode()
-        if(path){
+        this.path = this.node.getPathForTargetNode()
+        if(this.path){
             //Send immediately and wait for the interval
-            Army.createNewArmy(path, this.node)
+            Army.createNewArmy(this.path, this.node)
 
             this.sendInterval = setInterval(() => {
-                Army.createNewArmy(path, this.node)
+                if (this.path) Army.createNewArmy(this.path, this.node)
             }, 1000)
         }
     }
 
     onUpdate() {
+        if(this.path != this.node.getPathForTargetNode()){
+            clearInterval(this.sendInterval)
+            this.path = this.node.getPathForTargetNode()
+            this.sendInterval = setInterval(() => {
+                if (this.path) Army.createNewArmy(this.path, this.node)
+            }, 1000)
+        }
     }
 
     onEnd() {
@@ -72,12 +82,14 @@ export class AttackState extends AbstractState{
     private node: BasicNode
     private sendInterval: number
     private incrementArmyInterval: number
+    private path: Path | null
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
         this.sendInterval = 0
         this.incrementArmyInterval = 0
+        this.path = null
     }
 
     onBegin() {
@@ -97,6 +109,13 @@ export class AttackState extends AbstractState{
     }
 
     onUpdate() {
+        if(this.path != this.node.getPathForTargetNode()){
+            clearInterval(this.sendInterval)
+            this.path = this.node.getPathForTargetNode()
+            this.sendInterval = setInterval(() => {
+                if (this.path) Army.createNewArmy(this.path, this.node)
+            }, 1000)
+        }
     }
 
     onEnd() {

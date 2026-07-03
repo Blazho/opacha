@@ -24,7 +24,10 @@
 - [x] Nodes current army is not shown
 - [x] Taking nodes should reset the increment of the army
 - [ ] Cant directly change target when the node is already sending
-
+* - [x] Change from one attack node to other attack node
+* - [x] Change from one supply node to other supply node
+* - [ ] Change from one attack node to other supply node
+* - [ ] Change from one supply node to other attack node
 ## Optional
 
 - [x] Implementation: Attacking should send physical attack circle and not only visual 

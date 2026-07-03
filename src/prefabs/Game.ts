@@ -118,7 +118,7 @@ export class Game{
             neutralControlGroup
         ]
 
-        Game.controllers.push(new AIController(aiControlGroup, 5000))
+        // Game.controllers.push(new AIController(aiControlGroup, 5000))
         // Game.controllers.push(new AIController(playerControlGroup, 5000))
         Game.controllers.push(new PlayerController(Game.canvas, playerControlGroup))
 
