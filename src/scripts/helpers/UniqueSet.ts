@@ -48,6 +48,14 @@ export class UniqueSet<T, K extends keyof T> {
         return false
     }
 
+    toList(): T[]{
+        const list: T[] = []
+        for(const item of this.items.values()){
+            list.push(item)
+        }
+        return list
+    }
+
     public toString(){
         let string = '[UniqueSet]: [\n'
         for(const [key, value] of this.items.entries()) {

@@ -1,0 +1,29 @@
+{
+  "level": "lvl1",
+  "nodes": [
+    { "id": "pn1", "x": 50, "y": 50, "currentArmy": 15 },
+    { "id": "n1", "x": 300, "y": 300, "currentArmy": 10, "incArmyCount": 0 },
+    { "id": "an1", "x": 550, "y": 550, "currentArmy": 15 }
+  ],
+  "groups": [
+    {
+      "name": "PlayerGroup",
+      "color": "#0000ff",
+      "groupNodes": ["pn1"]
+    },
+    {
+      "name": "NeutralGroup",
+      "color": "#6E6E6EFF",
+      "groupNodes": ["n1"]
+    },
+    {
+      "name": "AIGroup",
+      "color": "#FFA500",
+      "groupNodes": ["an1"]
+    }
+  ],
+  "paths": [
+    { "node1": "pn1", "node2": "n1" },
+    { "node1": "n1", "node2": "an1" }
+  ]
+}

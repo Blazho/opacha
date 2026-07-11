@@ -3,6 +3,9 @@ import {ControlGroup} from "../scripts/node/ControlGroup.js";
 import {PlayerController} from "../scripts/controllers/PlayerController.js";
 import {AIController} from "../scripts/controllers/AIController.js";
 import {MainMenu} from "../ui/MainMenu.js";
+import {LEVELS} from "../scripts/config/constants.js";
+import {loadLevel, parseJsonLevel} from "../configs/dataLoader.js";
+import {ILevel} from "../configs/filesStructures.js";
 
 export class Game{
     private static instance: Game
@@ -46,7 +49,7 @@ export class Game{
     public init(){
         console.log("Game initiating")
         this.initCanvas()
-        this.initMenu()
+        // this.initMenu()
     }
 
     public loadTestLevel(){
@@ -121,8 +124,25 @@ export class Game{
         // Game.controllers.push(new AIController(aiControlGroup, 5000))
         // Game.controllers.push(new AIController(playerControlGroup, 5000))
         Game.controllers.push(new PlayerController(Game.canvas, playerControlGroup))
-
     }
+
+    public loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
+        loadLevel(levelName).then(r=> {
+            const groups =  parseJsonLevel(r as ILevel)
+            Game.groups = groups.toList()
+            Game.controllers = []
+
+            for (const group of Game.groups){
+                //todo constant
+                if(group.name == "PlayerGroup"){
+                    Game.controllers.push(new PlayerController(Game.canvas, group))
+                }else if(group.name.includes("AI")){
+                    Game.controllers.push(new AIController(group))
+                }
+            }
+        })
+
+}
 
     public render(){
         if(!Game.context){

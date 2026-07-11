@@ -28,6 +28,7 @@
 * - [x] Change from one supply node to other supply node
 * - [ ] Change from one attack node to other supply node
 * - [ ] Change from one supply node to other attack node
+- [ ] data fetching
 ## Optional
 
 - [x] Implementation: Attacking should send physical attack circle and not only visual 

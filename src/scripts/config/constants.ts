@@ -6,3 +6,6 @@ export const MENU_TABS = {
     "OPTIONS" : "Options"
 } as const
 
+export const LEVELS = {
+    "ONE": "Level-1"
+}

@@ -6,6 +6,7 @@ import {Pair, Position} from "../scripts/helpers/IHelper";
 import { inRadius, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
 import {ControlGroup} from "../scripts/node/ControlGroup";
 import {Path} from "./Path";
+import {IBasicNode} from "../configs/filesStructures";
 
 //todo separate structure from render
 export class BasicNode {
@@ -48,6 +49,16 @@ export class BasicNode {
 
 
         this.setState("IdleState")
+    }
+
+    public static initNode(nodeRaw: IBasicNode): BasicNode{
+        const id = nodeRaw.id
+        const position = { x: nodeRaw.x, y: nodeRaw.y}
+        const incArmyCount = nodeRaw.incArmyCount || 1
+        const currentArmy = nodeRaw.currentArmy || 0
+        const size = nodeRaw.radius || 50
+
+        return new BasicNode(id, position.x, position.y, incArmyCount, currentArmy, size)
     }
 
     public getGroup(): ControlGroup | null { return this.group}
