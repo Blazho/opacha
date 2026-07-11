@@ -16,7 +16,6 @@
 * - [ ] Should not supply if is connected to enemy node
 * - [ ] Should consider on route army + node army before deciding to attack
 - [x] Armies should have count on top of them
-- [ ] Main menu is singleton
 
 ## Bugs
 
@@ -48,6 +47,9 @@
 ## Improvements
 - [ ] End game screen
 - [ ] Main menu look
+
+## Rejected
+- [ ] Main menu is singleton
 
 -----------------------------
 ### Code styles
