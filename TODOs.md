@@ -28,8 +28,8 @@
 * - [x] Change from one supply node to other supply node
 * - [ ] Change from one attack node to other supply node
 * - [ ] Change from one supply node to other attack node
-- [ ] data fetching
-- [ ] Node can be taken when sending/attacking on same path
+- [x] Node can be taken when sending/attacking on same path
+- [ ] Collision detection overshoot when army moves too fast
 
 ## Optional
 
@@ -43,6 +43,7 @@
 * - [ ] Optimize draw paths
 * - [ ] checkOptionalNodes::ControlGroup - optimise
 - [ ] Map creation tool
+- [ ] Level data fetching position in app
 
 -----------------------------
 ### Code styles

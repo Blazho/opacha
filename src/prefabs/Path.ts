@@ -91,7 +91,7 @@ export class Path{
     }
 
     private reachedDestination(army: Army, destinationPosition: Position){
-        return inRadius(army.position, destinationPosition, army.originNode.getSize());
+        return inRadius(army.position, destinationPosition, 1);  //1 radius so the army does not overshoot and collision is not detected
     }
 
     private drawPath(ctx: CanvasRenderingContext2D){

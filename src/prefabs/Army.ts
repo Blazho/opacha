@@ -11,9 +11,9 @@ export class Army{
     private path: Path
     private _position: Position
 
-    constructor(originNode: BasicNode, count: number, path: Path) {
+    constructor(originNode: BasicNode, path: Path) {
         this._originNode = originNode;
-        this._count = count;
+        this._count = originNode.getCurrentArmy();
         this.path = path
         this._position = {x: originNode.getPosition().x, y: originNode.getPosition().y}
         this._controlGroup = originNode.getGroup() ?? new ControlGroup("Neutral", "gray")
@@ -85,7 +85,7 @@ export class Army{
     }
 
     public static createNewArmy(path: Path, from: BasicNode){
-        const army = new Army(from, from.getCurrentArmy(), path)
+        const army = new Army(from, path)
         path.addArmy(army)
         from.decrementArmy(from.getCurrentArmy())
     }
