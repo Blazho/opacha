@@ -7,6 +7,7 @@ export class Army{
     public readonly id: string
     private readonly _originNode: BasicNode
     private readonly _controlGroup: ControlGroup
+    static readonly radius = 10
     private _count: number
     private path: Path
     private _position: Position
@@ -24,7 +25,7 @@ export class Army{
 
     draw(ctx: CanvasRenderingContext2D){
         ctx.beginPath()
-        ctx.arc(this._position.x, this._position.y, 10, 0, 2 * Math.PI)
+        ctx.arc(this._position.x, this._position.y, Army.radius, 0, 2 * Math.PI)
         const group = this.group
         if(group){
             ctx.fillStyle = group.color

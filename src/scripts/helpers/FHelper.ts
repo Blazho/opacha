@@ -54,3 +54,22 @@ export function getMousePosition(e: PointerEvent | MouseEvent, canvas: HTMLCanva
         y: e.clientY - rect.top
     }
 }
+
+function isPointBetween2D(
+    p: Position,
+    a: Position,
+    b: Position,
+    epsilon: number = 0.000001
+): boolean {
+    // 1. Check if the point is within the bounding box of a and b
+    const withinX = p.x >= Math.min(a.x, b.x) - epsilon && p.x <= Math.max(a.x, b.x) + epsilon;
+    const withinY = p.y >= Math.min(a.y, b.y) - epsilon && p.y <= Math.max(a.y, b.y) + epsilon;
+
+    if (!withinX || !withinY) return false;
+
+    // 2. Check collinearity using the cross product
+    const crossProduct = (p.y - a.y) * (b.x - a.x) - (p.x - a.x) * (b.y - a.y);
+
+    // If cross product is close to 0, the points are lined up
+    return Math.abs(crossProduct) <= epsilon;
+}

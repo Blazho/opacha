@@ -60,7 +60,7 @@ export class Path{
                 if(army === otherArmy || otherArmy.count <= 0){
                     continue
                 }
-                if(army.group !== otherArmy.group && inRadius(army.position, otherArmy.position, 10)){
+                if(army.group !== otherArmy.group && inRadius(army.position, otherArmy.position, Army.radius)){
                     const value = army.count
                     army.count -= otherArmy.count
                     otherArmy.count -= value
