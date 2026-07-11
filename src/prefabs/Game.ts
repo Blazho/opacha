@@ -3,16 +3,17 @@ import {ControlGroup} from "../scripts/node/ControlGroup.js";
 import {PlayerController} from "../scripts/controllers/PlayerController.js";
 import {AIController} from "../scripts/controllers/AIController.js";
 import {MainMenu} from "../ui/MainMenu.js";
-import {GROUP_TYPES, LEVELS} from "../scripts/config/constants.js";
+import {GROUP_TYPES, LEVELS, MENU_TABS} from "../scripts/config/constants.js";
 import {fetchLevel, parseJsonLevel} from "../configs/dataLoader.js";
 import {ILevel} from "../configs/filesStructures.js";
+import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 
 export class Game{
     private static instance: Game
     private static container: HTMLElement
     private static context: CanvasRenderingContext2D
     private static canvas: HTMLCanvasElement
-    private static groups: ControlGroup[]
+    private static groups: UniqueSet<ControlGroup, "name">
     private static interval: number
     private static controllers: any[]
     private static mainMenu: MainMenu
@@ -27,7 +28,7 @@ export class Game{
     public static getInstance(container: HTMLElement | null = null): Game {
         if(!Game.instance){
             Game.instance = new Game()
-            Game.groups = []
+            Game.groups = new UniqueSet<ControlGroup, "name">("name")
             Game.controllers = []
         }
 
@@ -115,11 +116,9 @@ export class Game{
             .addOtherConnection(ain1, nn8)
             .addOtherConnection(ain1, nn9)
 
-        Game.groups = [
-            playerControlGroup,
-            aiControlGroup,
-            neutralControlGroup
-        ]
+        Game.groups.add(playerControlGroup)
+        Game.groups.add(aiControlGroup)
+        Game.groups.add(neutralControlGroup)
 
         Game.controllers.push(new AIController(aiControlGroup, 5000))
         // Game.controllers.push(new AIController(playerControlGroup, 5000))
@@ -128,11 +127,10 @@ export class Game{
 
     public loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
         fetchLevel(levelName).then(r=> {
-            const groups =  parseJsonLevel(r as ILevel)
-            Game.groups = groups.toList()
+            Game.groups = parseJsonLevel(r as ILevel)
             Game.controllers = []
 
-            for (const group of Game.groups){
+            for (const [_, group] of Game.groups.entries()){
                 if(group.name == GROUP_TYPES.PLAYER){
                     Game.controllers.push(new PlayerController(Game.canvas, group))
                 }else if(group.name.includes("AI")){
@@ -143,7 +141,7 @@ export class Game{
             this.render()
         })
 
-}
+    }
 
     public render(){
         if(!Game.context){
@@ -152,18 +150,23 @@ export class Game{
         }
 
         Game.interval = setInterval(() => {
+
+            if(this.checkForGameEnd()){
+                return
+            }
+
             //clear canvas
             Game.context.clearRect(0, 0, Game.canvas.width, Game.canvas.height)
 
-            for(const group of Game.groups){
+            for(const [_, group] of Game.groups.entries()){
                 group.update()
             }
 
-            for(const group of Game.groups){
+            for(const [_, group] of Game.groups.entries()){
                 group.drawNodesPathsAndArmies(Game.context)
             }
 
-            for(const group of Game.groups){
+            for(const [_, group] of Game.groups.entries()){
                 group.drawNodes(Game.context)
             }
         }, 1000 / 60)
@@ -195,5 +198,22 @@ export class Game{
         console.log("Loading menu")
         Game.mainMenu = new MainMenu(Game.canvas, Game.instance)
         Game.mainMenu.load()
+    }
+
+    private checkForGameEnd(){
+        for(const [_, group] of Game.groups.entries()) {
+            if (group.isDefeated()){
+                Game.groups.delete(group.name)
+            }
+        }
+
+        if(Game.groups.length() <= 1){
+            alert(`Player ${Game.groups.toList()[0].name} won`)
+            this.stopGame()
+            Game.mainMenu.activateTab(MENU_TABS.BASE)
+
+            return true
+        }
+        return  false
     }
 }

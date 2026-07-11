@@ -138,6 +138,10 @@ export class ControlGroup {
         this.checkOptionalNodes()
     }
 
+    public isDefeated(): boolean{
+        return this._groupNodes.length() == 0
+    }
+
     private checkOptionalNodes(){
         this.otherNodes.clear()
         for (const [_, value] of this._groupNodes.entries()){

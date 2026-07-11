@@ -66,6 +66,8 @@ export class MainMenu{
             tab.isActive = true
             this.clearCanvasContext()
             tab.draw()
+        }else {
+            console.error("Tab not found")
         }
     }
 

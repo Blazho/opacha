@@ -8,7 +8,7 @@
 - [x] findNode::ControlGroup - it is allowed to select other nodes
 - [x] Take node from enemy
 - [x] Enemy armies does not collide with each other
-- [ ] Endgame screen
+- [x] Endgame screen
 - [ ] UI
 * - [x] Main menu
 * - [ ] Options
@@ -44,6 +44,10 @@
 * - [ ] checkOptionalNodes::ControlGroup - optimise
 - [ ] Map creation tool
 - [ ] Level data fetching position in app
+
+## Improvements
+- [ ] End game screen
+- [ ] Main menu look
 
 -----------------------------
 ### Code styles
