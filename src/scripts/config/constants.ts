@@ -6,6 +6,12 @@ export const MENU_TABS = {
     "OPTIONS" : "Options"
 } as const
 
-export const LEVELS = {
-    "ONE": "Level-1"
+export const GROUP_TYPES = {
+    "PLAYER": "PlayerGroup"
 }
+
+export const LEVELS = {
+    "ONE": "Level-1",
+    "TWO": "Level-2",
+    "THREE": "Level-3",
+} as const

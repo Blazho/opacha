@@ -4,7 +4,7 @@ import {BasicNode} from "../prefabs/node.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {ControlGroup} from "../scripts/node/ControlGroup.js";
 
-export async function loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
+export async function fetchLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
     try {
         // 1. Fetch the local file relative to your script/HTML location
         const response = await fetch(`/data/${levelName}.json`);

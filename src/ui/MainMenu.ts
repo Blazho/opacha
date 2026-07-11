@@ -2,7 +2,7 @@ import {Button} from "./Button.js";
 import {Game} from "../prefabs/Game.js";
 import {getMousePosition} from "../scripts/helpers/FHelper.js";
 import {MenuTab} from "./MenuTab.js";
-import {MENU_TABS} from "../scripts/config/constants.js";
+import {LEVELS, MENU_TABS} from "../scripts/config/constants.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 
 export class MainMenu{
@@ -10,6 +10,9 @@ export class MainMenu{
     private readonly game: Game
     private readonly buttonWidth = 200
     private readonly buttonHeight = 80
+
+    private readonly buttonWidthS = 100
+    private readonly buttonHeightS = 80
 
     private menuTabs: UniqueSet<MenuTab, "name">
 
@@ -94,8 +97,7 @@ export class MainMenu{
             new Button("Back", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
                 this.activateTab(MENU_TABS.BASE)
             }),
-            new Button("CAMPAIGN TAB", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
-        })
+                ...this.genCampaignLvlButtons()
         ])
         this.menuTabs.add(campaignTab)
     }
@@ -112,8 +114,37 @@ export class MainMenu{
         this.menuTabs.add(optionsTab)
     }
 
+    /**
+     * Generate level's buttons in pattern n x 2
+     *
+     * n is row/s
+     *
+     * 2 is columns
+     */
+    private genCampaignLvlButtons(){
+        const listOfBtns: Button[] = []
+        let index = 0
+        for(const value of Object.values(LEVELS)){
+            listOfBtns.push(
+                new Button(value, this.buttonWidthS, this.buttonHeightS, {x: this.calcXWithOffset(index), y: this.calcYWithOffset(index)}, () => this.game.loadLevel(value))
+            )
+            index++
+        }
+        return listOfBtns
+    }
+
     private calcXMiddleBtnPos(){
         return (this.canvas.width / 2) - (this.buttonWidth / 2)
+    }
+
+    private calcXWithOffset(index: number){
+        const offset = Math.floor(index % 2) * this.buttonWidthS
+        return (this.canvas.width / 2) - this.buttonWidthS + offset
+    }
+
+    private calcYWithOffset(index: number){
+        const offset = Math.floor(index / 2) * 100
+        return 200 + offset
     }
 
     private draw(){

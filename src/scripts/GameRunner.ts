@@ -10,6 +10,6 @@ gameObject.init()
 
 // gameObject.loadTestLevel()
 
-gameObject.loadLevel(LEVELS.ONE)
-gameObject.render()
+// gameObject.loadLevel(LEVELS.ONE)
+// gameObject.render()
 

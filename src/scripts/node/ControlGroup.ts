@@ -138,8 +138,6 @@ export class ControlGroup {
         this.checkOptionalNodes()
     }
 
-    //todo not optimised
-    //fixes optional nodes
     private checkOptionalNodes(){
         this.otherNodes.clear()
         for (const [_, value] of this._groupNodes.entries()){

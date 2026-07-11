@@ -3,8 +3,8 @@ import {ControlGroup} from "../scripts/node/ControlGroup.js";
 import {PlayerController} from "../scripts/controllers/PlayerController.js";
 import {AIController} from "../scripts/controllers/AIController.js";
 import {MainMenu} from "../ui/MainMenu.js";
-import {LEVELS} from "../scripts/config/constants.js";
-import {loadLevel, parseJsonLevel} from "../configs/dataLoader.js";
+import {GROUP_TYPES, LEVELS} from "../scripts/config/constants.js";
+import {fetchLevel, parseJsonLevel} from "../configs/dataLoader.js";
 import {ILevel} from "../configs/filesStructures.js";
 
 export class Game{
@@ -49,7 +49,7 @@ export class Game{
     public init(){
         console.log("Game initiating")
         this.initCanvas()
-        // this.initMenu()
+        this.initMenu()
     }
 
     public loadTestLevel(){
@@ -121,25 +121,26 @@ export class Game{
             neutralControlGroup
         ]
 
-        // Game.controllers.push(new AIController(aiControlGroup, 5000))
+        Game.controllers.push(new AIController(aiControlGroup, 5000))
         // Game.controllers.push(new AIController(playerControlGroup, 5000))
         Game.controllers.push(new PlayerController(Game.canvas, playerControlGroup))
     }
 
     public loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
-        loadLevel(levelName).then(r=> {
+        fetchLevel(levelName).then(r=> {
             const groups =  parseJsonLevel(r as ILevel)
             Game.groups = groups.toList()
             Game.controllers = []
 
             for (const group of Game.groups){
-                //todo constant
-                if(group.name == "PlayerGroup"){
+                if(group.name == GROUP_TYPES.PLAYER){
                     Game.controllers.push(new PlayerController(Game.canvas, group))
                 }else if(group.name.includes("AI")){
                     Game.controllers.push(new AIController(group))
                 }
             }
+
+            this.render()
         })
 
 }

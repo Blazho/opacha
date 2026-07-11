@@ -7,19 +7,19 @@
 - [x] AI controller
 - [x] findNode::ControlGroup - it is allowed to select other nodes
 - [x] Take node from enemy
-- [ ] checkOptionalNodes::ControlGroup - optimise
 - [x] Enemy armies does not collide with each other
 - [ ] Endgame screen
-- [ ] Optimize army logic
-- [ ] Optimize draw paths
 - [ ] UI
+* - [x] Main menu
+* - [ ] Options
 - [ ] AI fix
 * - [ ] Should not supply if is connected to enemy node
-- [ ] Map creation tool
-- [x] Main menu
+* - [ ] Should consider on route army + node army before deciding to attack
 - [x] Armies should have count on top of them
+- [ ] Main menu is singleton
 
 ## Bugs
+
 - [x] Selected node indicator broken
 - [x] Nodes current army is not shown
 - [x] Taking nodes should reset the increment of the army
@@ -29,6 +29,8 @@
 * - [ ] Change from one attack node to other supply node
 * - [ ] Change from one supply node to other attack node
 - [ ] data fetching
+- [ ] Node can be taken when sending/attacking on same path
+
 ## Optional
 
 - [x] Implementation: Attacking should send physical attack circle and not only visual 
@@ -37,7 +39,10 @@
 - [ ] More type of nodes
 - [x] Path mechanics
 - [ ] Optimize num.1
-- [ ] Main menu is singleton
+* - [ ] Optimize army logic
+* - [ ] Optimize draw paths
+* - [ ] checkOptionalNodes::ControlGroup - optimise
+- [ ] Map creation tool
 
 -----------------------------
 ### Code styles

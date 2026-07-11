@@ -7,11 +7,11 @@ import {AIController} from "./scripts/controllers/AIController.js";
 import {Button} from "./ui/Button.js";
 import {MainMenu} from "./ui/MainMenu.js";
 import {Game} from "./prefabs/Game.js";
-import {loadLevel, parseJsonLevel} from "./configs/dataLoader.js";
+import {fetchLevel, parseJsonLevel} from "./configs/dataLoader.js";
 import {LEVELS} from "./scripts/config/constants.js";
 
 
-loadLevel(LEVELS.ONE).then(r=> parseJsonLevel(r))
+// fetchLevel(LEVELS.ONE).then(r=> parseJsonLevel(r))
 
 
 

@@ -3,7 +3,7 @@ import {AttackState, IdleState, SendState} from "../scripts/node/NodeStates.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AbstractState} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
-import { inRadius, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
+import {inRadius, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
 import {ControlGroup} from "../scripts/node/ControlGroup";
 import {Path} from "./Path";
 import {IBasicNode} from "../configs/filesStructures";
@@ -54,9 +54,9 @@ export class BasicNode {
     public static initNode(nodeRaw: IBasicNode): BasicNode{
         const id = nodeRaw.id
         const position = { x: nodeRaw.x, y: nodeRaw.y}
-        const incArmyCount = nodeRaw.incArmyCount || 1
-        const currentArmy = nodeRaw.currentArmy || 0
-        const size = nodeRaw.radius || 50
+        const incArmyCount = nodeRaw.incArmyCount ?? 1
+        const currentArmy = nodeRaw.currentArmy ?? 0
+        const size = nodeRaw.radius ?? 50
 
         return new BasicNode(id, position.x, position.y, incArmyCount, currentArmy, size)
     }
@@ -167,7 +167,7 @@ export class BasicNode {
         return `${this.id} - ${this.group?.name}`
     }
 
-    drawNode(ctx: CanvasRenderingContext2D, color: string, selected: boolean = false) {
+    drawNode(ctx: CanvasRenderingContext2D, color: string) {
         let circleColor: Pair<string> = {
             left: color,
             right: 'black'
