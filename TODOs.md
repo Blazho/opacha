@@ -12,9 +12,9 @@
 - [ ] UI
 * - [x] Main menu
 * - [ ] Options
-- [ ] AI fix
-* - [ ] Should not supply if is connected to enemy node
-* - [ ] Should consider on route army + node army before deciding to attack
+- [x] AI fix
+* - [x] Should not supply if is connected to enemy node
+* - [x] Should consider on route army + node army before deciding to attack
 - [x] Armies should have count on top of them
 
 ## Bugs
@@ -29,6 +29,7 @@
 * - [ ] Change from one supply node to other attack node
 - [x] Node can be taken when sending/attacking on same path
 - [ ] Collision detection overshoot when army moves too fast
+- [ ] Escape confirm does not reset game
 
 ## Optional
 

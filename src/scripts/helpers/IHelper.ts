@@ -3,7 +3,7 @@ export interface Position {
     y:number
 }
 
-export interface Pair<T>{
+export interface Pair<T, K>{
     left: T,
-    right: T
+    right: K
 }

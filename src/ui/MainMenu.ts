@@ -165,6 +165,7 @@ export class MainMenu{
     private addClickEventListener(){
         this.canvas.addEventListener("click", this.handleClick)
         window.addEventListener("keyup", (e) => {
+            //todo game does not reset completely
             if(e.code === "Escape"){
                 const isConfirmed: boolean = window.confirm("Are you sure you want to exit current game?")
                     if(isConfirmed){

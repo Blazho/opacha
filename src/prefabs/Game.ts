@@ -7,6 +7,7 @@ import {GROUP_TYPES, LEVELS, MENU_TABS} from "../scripts/config/constants.js";
 import {fetchLevel, parseJsonLevel} from "../configs/dataLoader.js";
 import {ILevel} from "../configs/filesStructures.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
+import {AIControllerV1} from "../scripts/controllers/AIControllerV1.js";
 
 export class Game{
     private static instance: Game
@@ -120,8 +121,8 @@ export class Game{
         Game.groups.add(aiControlGroup)
         Game.groups.add(neutralControlGroup)
 
-        Game.controllers.push(new AIController(aiControlGroup, 5000))
-        // Game.controllers.push(new AIController(playerControlGroup, 5000))
+        // Game.controllers.push(new AIController(aiControlGroup, 5000))
+        Game.controllers.push(new AIControllerV1(aiControlGroup, 2000))
         Game.controllers.push(new PlayerController(Game.canvas, playerControlGroup))
     }
 
@@ -134,10 +135,9 @@ export class Game{
                 if(group.name == GROUP_TYPES.PLAYER){
                     Game.controllers.push(new PlayerController(Game.canvas, group))
                 }else if(group.name.includes("AI")){
-                    Game.controllers.push(new AIController(group))
+                    Game.controllers.push(new AIControllerV1(group))
                 }
             }
-
             this.render()
         })
 

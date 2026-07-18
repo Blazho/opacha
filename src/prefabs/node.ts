@@ -19,7 +19,7 @@ export class BasicNode {
     private stateMachine: StateMachine
     public targetNode: BasicNode | null
     //reference to the group it belongs
-    private group: ControlGroup | null
+    private group: ControlGroup | undefined
     isSelected = false //if player selected it
 
     private states: UniqueSet<AbstractState, "stateName">
@@ -39,7 +39,6 @@ export class BasicNode {
         this.currentArmy = currentArmy;
         this.targetNode = null
         this.lastSendInterval = 0
-        this.group = null
 
         this.connectedTo = new UniqueSet<Path, "id">("id")
 
@@ -61,7 +60,7 @@ export class BasicNode {
         return new BasicNode(id, position.x, position.y, incArmyCount, currentArmy, size)
     }
 
-    public getGroup(): ControlGroup | null { return this.group}
+    public getGroup(): ControlGroup | undefined { return this.group}
     public getId() { return this.id; }
     public getPosition() { return this.position}
     public getCurrentArmy() { return this.currentArmy; }
@@ -99,10 +98,6 @@ export class BasicNode {
 
     public setGroup(newGroup: ControlGroup){
         this.group = newGroup
-    }
-
-    public clearGroup(){
-        this.group = null
     }
 
     public isInsideNode(position: Position): boolean{
@@ -168,7 +163,7 @@ export class BasicNode {
     }
 
     drawNode(ctx: CanvasRenderingContext2D, color: string) {
-        let circleColor: Pair<string> = {
+        let circleColor: Pair<string, string> = {
             left: color,
             right: 'black'
         }
