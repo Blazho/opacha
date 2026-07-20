@@ -88,6 +88,7 @@ export class MainMenu{
             new Button("Test level", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
                 this.game.loadTestLevel()
                 this.game.render()
+                console.log("Skirmish tab")
             })
         ])
         this.menuTabs.add(skirmishTab)
@@ -169,6 +170,7 @@ export class MainMenu{
             if(e.code === "Escape"){
                 const isConfirmed: boolean = window.confirm("Are you sure you want to exit current game?")
                     if(isConfirmed){
+                        console.log("Game level exited")
                         this.game.stopGame()
                         this.activateTab(MENU_TABS.BASE)
                     }

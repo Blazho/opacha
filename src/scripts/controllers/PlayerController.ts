@@ -1,12 +1,13 @@
 import {ControlGroup} from "../node/ControlGroup";
 import {BasicNode} from "../../prefabs/node";
 import {getMousePosition} from "../helpers/FHelper.js";
+import {Controller} from "./Controller";
 
 /**
  * Class responsible for player inputs
  *
  */
-export class PlayerController{
+export class PlayerController implements Controller{
     /**
      * click
      *
@@ -34,6 +35,17 @@ export class PlayerController{
 
         this.setClickEventListener()
         this.setDBClickListener()
+    }
+
+    getGroupName(): string {
+        return this.playerGroup.name
+    }
+
+    process(): void {
+
+    }
+    stop(): void {
+        this.clearCanvasEvents()
     }
 
     public clearCanvasEvents(){

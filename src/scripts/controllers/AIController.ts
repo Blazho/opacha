@@ -1,7 +1,8 @@
 import {ControlGroup} from "../node/ControlGroup";
 import {BasicNode} from "../../prefabs/node";
+import {Controller} from "./Controller";
 
-export class AIController{
+export class AIController implements Controller{
     private controlGroup: ControlGroup
     private decisionInterval: number
     private processInterval: number | undefined
@@ -15,7 +16,16 @@ export class AIController{
         }, this.decisionInterval)
     }
 
-    private process(){
+    getGroupName(): string {
+        return this.controlGroup.name
+    }
+
+    stop(): void {
+        console.log(`${this.getGroupName()} stopped`)
+        clearInterval(this.processInterval)
+    }
+
+    public process(){
         for(const [aiKey, aiNode] of this.controlGroup.groupNodes.entries()){
             let target : BasicNode | undefined
 

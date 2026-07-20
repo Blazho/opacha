@@ -8,6 +8,7 @@ import {fetchLevel, parseJsonLevel} from "../configs/dataLoader.js";
 import {ILevel} from "../configs/filesStructures.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AIControllerV1} from "../scripts/controllers/AIControllerV1.js";
+import {Controller} from "../scripts/controllers/Controller.js";
 
 export class Game{
     private static instance: Game
@@ -16,7 +17,7 @@ export class Game{
     private static canvas: HTMLCanvasElement
     private static groups: UniqueSet<ControlGroup, "name">
     private static interval: number
-    private static controllers: any[]
+    private static controllers: Map<string, Controller>
     private static mainMenu: MainMenu
 
     private constructor() {
@@ -30,7 +31,7 @@ export class Game{
         if(!Game.instance){
             Game.instance = new Game()
             Game.groups = new UniqueSet<ControlGroup, "name">("name")
-            Game.controllers = []
+            Game.controllers = new Map()
         }
 
         if (container){
@@ -95,55 +96,52 @@ export class Game{
             .addNode(ain1)
 
         //paths
-        playerControlGroup
-            .addOtherConnection(pn1, nn1)
-            .addOtherConnection(pn1, nn2)
+        ControlGroup.addConnection(pn1, nn1)
+        ControlGroup.addConnection(pn1, nn2)
 
-        neutralControlGroup
-            .addConnection(nn1, nn3)
-            .addConnection(nn2, nn3)
-            .addConnection(nn3, nn4)
-            .addConnection(nn4, nn5)
-            .addConnection(nn5, nn6)
-            .addConnection(nn6, nn7)
-            .addConnection(nn7, nn8)
-            .addConnection(nn7, nn9)
-            .addOtherConnection(nn1, pn1)
-            .addOtherConnection(nn2, pn1)
-            .addOtherConnection(nn8, ain1)
-            .addOtherConnection(nn9, ain1)
+        ControlGroup.addConnection(nn1, nn3)
+        ControlGroup.addConnection(nn2, nn3)
+        ControlGroup.addConnection(nn3, nn4)
+        ControlGroup.addConnection(nn4, nn5)
+        ControlGroup.addConnection(nn5, nn6)
+        ControlGroup.addConnection(nn6, nn7)
+        ControlGroup.addConnection(nn7, nn8)
+        ControlGroup.addConnection(nn7, nn9)
 
-        aiControlGroup
-            .addOtherConnection(ain1, nn8)
-            .addOtherConnection(ain1, nn9)
+        ControlGroup.addConnection(ain1, nn8)
+        ControlGroup.addConnection(ain1, nn9)
+
+        playerControlGroup.init()
+        aiControlGroup.init()
 
         Game.groups.add(playerControlGroup)
         Game.groups.add(aiControlGroup)
         Game.groups.add(neutralControlGroup)
 
-        // Game.controllers.push(new AIController(aiControlGroup, 5000))
-        Game.controllers.push(new AIControllerV1(aiControlGroup, 2000))
-        Game.controllers.push(new PlayerController(Game.canvas, playerControlGroup))
+        Game.controllers.set(aiControlGroup.name, new AIControllerV1(aiControlGroup, 2000))
+        Game.controllers.set(playerControlGroup.name, new PlayerController(Game.canvas, playerControlGroup))
     }
 
     public loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
         fetchLevel(levelName).then(r=> {
             Game.groups = parseJsonLevel(r as ILevel)
-            Game.controllers = []
+            Game.controllers = new Map()
 
             for (const [_, group] of Game.groups.entries()){
                 if(group.name == GROUP_TYPES.PLAYER){
-                    Game.controllers.push(new PlayerController(Game.canvas, group))
+                    Game.controllers.set(group.name, new PlayerController(Game.canvas, group))
                 }else if(group.name.includes("AI")){
-                    Game.controllers.push(new AIControllerV1(group))
+                    Game.controllers.set(group.name, new AIControllerV1(group))
                 }
             }
             this.render()
+            console.log("Load level game method")
         })
 
     }
 
     public render(){
+        console.log("Render called")
         if(!Game.context){
             console.error("Canvas context is " + Game.context)
             return
@@ -158,6 +156,7 @@ export class Game{
             //clear canvas
             Game.context.clearRect(0, 0, Game.canvas.width, Game.canvas.height)
 
+            //todo move outside to update method
             for(const [_, group] of Game.groups.entries()){
                 group.update()
             }
@@ -174,6 +173,13 @@ export class Game{
 
     public stopGame() {
         clearInterval(Game.interval)
+        for(const [_, group] of Game.groups.entries()){
+            group.stopNodes()
+        }
+        Game.groups.clear()
+        for(const controller of Game.controllers.values()){
+            controller.stop()
+        }
     }
 
     private initCanvas(){
@@ -203,6 +209,8 @@ export class Game{
     private checkForGameEnd(){
         for(const [_, group] of Game.groups.entries()) {
             if (group.isDefeated()){
+                const controller = Game.controllers.get(group.name)
+                controller?.stop()
                 Game.groups.delete(group.name)
             }
         }

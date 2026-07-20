@@ -29,6 +29,9 @@ export function parseJsonLevel(levelRaw: ILevel): UniqueSet<ControlGroup, "name"
     const nodes = createNodes(nodesRaw)
     const groups = createAllGroups(groupsRaw, nodes)
     connectAllNodes(pathsRaw, nodes)
+    for(const [_, group] of groups.entries()){
+        group.init()
+    }
     return groups
 
 }
@@ -74,16 +77,6 @@ function connectAllNodes(pathsRaw: IPath[], nodes: UniqueSet<BasicNode, "id">){
             console.error(`Nodes ${path.node1} and/or ${path.node2} does not exist`)
             return
         }
-
-        const group1 = node1.getGroup()
-        const group2 = node2.getGroup()
-        if(group1 && group2){
-            if(group1 === group2){
-                group1.addConnection(node1, node2)
-            }else {
-                group1.addOtherConnection(node1, node2)
-                group2.addOtherConnection(node2, node1)
-            }
-        }
+        ControlGroup.addConnection(node1, node2)
     }
 }

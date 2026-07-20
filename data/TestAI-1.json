@@ -4,7 +4,8 @@
     { "id": "an1", "x": 50, "y": 50, "currentArmy": 15, "incArmyCount": 0},
     { "id": "an2", "x": 50, "y": 300, "currentArmy": 10, "incArmyCount": 0},
     { "id": "an3", "x": 300, "y": 300, "currentArmy": 15, "incArmyCount": 0},
-    { "id": "n1", "x": 300, "y": 50, "currentArmy": 15, "incArmyCount": 0}
+    { "id": "n1", "x": 300, "y": 50, "currentArmy": 15, "incArmyCount": 0},
+    { "id": "an21", "x": 500, "y": 300, "currentArmy": 30, "incArmyCount": 0}
   ],
   "groups": [
     {
@@ -16,11 +17,17 @@
       "name": "AIGroup",
       "color": "#FFA500",
       "groupNodes": ["an3", "an2", "an1"]
+    },
+    {
+      "name": "AIGroup2",
+      "color": "#FFA5FF",
+      "groupNodes": ["an21"]
     }
   ],
   "paths": [
     { "node1": "an2", "node2": "an3" },
     { "node1": "an2", "node2": "an1" },
-    { "node1": "an3", "node2": "n1" }
+    { "node1": "an3", "node2": "n1" },
+    { "node1": "an21", "node2": "an3"}
   ]
 }

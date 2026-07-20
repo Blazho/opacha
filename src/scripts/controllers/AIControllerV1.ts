@@ -1,8 +1,9 @@
 import {ControlGroup} from "../node/ControlGroup.js";
 import {BasicNode} from "../../prefabs/node.js";
 import {GROUP_TYPES} from "../config/constants.js";
+import {Controller} from "./Controller.js";
 
-export class AIControllerV1{
+export class AIControllerV1 implements Controller{
 
     private controlGroup: ControlGroup
     private decisionInterval: number
@@ -18,8 +19,11 @@ export class AIControllerV1{
         }, this.decisionInterval)
     }
 
+    getGroupName(): string {
+        return this.controlGroup.name
+    }
+
     public process() {
-        console.log("==========Process ai called==========", this.controlGroup)
         for(const [_, node] of this.controlGroup.groupNodes.entries()){
             if(this.isAlert(node)){
                 this.findAttackTarget(node)
@@ -156,14 +160,14 @@ export class AIControllerV1{
             const otherGroup = otherNode.getGroup()
             if(!otherGroup) continue
 
-            const totalEnemyArmy = conPath.getOtherGroupTotalArmy(otherGroup.name)
+            const totalEnemyArmy = conPath.getOtherGroupPathArmy(otherGroup.name) + otherNode.getCurrentArmy()
             if((otherGroup.name === GROUP_TYPES.NEUTRAL || otherGroup.name !== node.getGroup()?.name) &&
+                totalEnemyArmy < node.getCurrentArmy() &&
                 totalEnemyArmy < minArmy){
                 minArmy = totalEnemyArmy
                 targetNode = otherNode
             }
         }
-
         if(targetNode && targetNode.getCurrentArmy() + 5 < node.getCurrentArmy()){ //5 offset
             this.setTarget(node, targetNode)
         }else {

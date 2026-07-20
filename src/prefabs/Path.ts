@@ -47,10 +47,10 @@ export class Path{
         return node === this.node1 ? this.node2 : this.node1
     }
 
-    getOtherGroupTotalArmy(groupName: string){
+    getOtherGroupPathArmy(groupName: string){
         let total = 0
         for(const [_, army] of this.armies.entries()){
-            if(army.group.name !== groupName){
+            if(army.group.name === groupName){
                 total += army.count
             }
         }

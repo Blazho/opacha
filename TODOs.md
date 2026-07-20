@@ -30,6 +30,7 @@
 - [x] Node can be taken when sending/attacking on same path
 - [ ] Collision detection overshoot when army moves too fast
 - [ ] Escape confirm does not reset game
+* - [ ] Nodes continue to send after game ended
 
 ## Optional
 
@@ -44,6 +45,7 @@
 * - [ ] checkOptionalNodes::ControlGroup - optimise
 - [ ] Map creation tool
 - [ ] Level data fetching position in app
+- [ ] Move update logic from render to update
 
 ## Improvements
 - [ ] End game screen
