@@ -1,13 +1,13 @@
 import {Button} from "./Button.js";
-import {Game} from "../prefabs/Game.js";
 import {getMousePosition} from "../scripts/helpers/FHelper.js";
 import {MenuTab} from "./MenuTab.js";
 import {LEVELS, MENU_TABS} from "../scripts/config/constants.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
+import {GameEngine} from "../scripts/GameEngine";
 
 export class MainMenu{
     private canvas : HTMLCanvasElement;
-    private readonly game: Game
+    private readonly game: GameEngine
     private readonly buttonWidth = 200
     private readonly buttonHeight = 80
 
@@ -16,7 +16,7 @@ export class MainMenu{
 
     private menuTabs: UniqueSet<MenuTab, "name">
 
-    constructor(canvas: HTMLCanvasElement, game: Game) {
+    constructor(canvas: HTMLCanvasElement, game: GameEngine) {
         this.canvas  = canvas;
         this.game = game
         this.menuTabs = new UniqueSet<MenuTab, "name">("name")
@@ -87,7 +87,7 @@ export class MainMenu{
             }),
             new Button("Test level", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
                 this.game.loadTestLevel()
-                this.game.render()
+                this.game.start()
                 console.log("Skirmish tab")
             })
         ])
@@ -171,7 +171,7 @@ export class MainMenu{
                 const isConfirmed: boolean = window.confirm("Are you sure you want to exit current game?")
                     if(isConfirmed){
                         console.log("Game level exited")
-                        this.game.stopGame()
+                        this.game.stop()
                         this.activateTab(MENU_TABS.BASE)
                     }
 

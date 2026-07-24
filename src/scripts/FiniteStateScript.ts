@@ -1,6 +1,6 @@
 export interface State {
     onBegin(): void;
-    onUpdate(): void;
+    onUpdate(dt: number): void;
     onEnd(): void;
 }
 
@@ -13,7 +13,7 @@ export abstract class AbstractState implements State{
     onEnd(): void {
     }
 
-    onUpdate(): void {
+    onUpdate(dt: number): void {
     }
 
 }

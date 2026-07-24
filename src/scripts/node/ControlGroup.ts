@@ -67,12 +67,12 @@ export class ControlGroup {
         node2.addPath(path)
     }
 
-    public update(){
+    public update(dt: number){
         if(this._groupNodes.length() === 0){
             return
         }
-        for(const [_, value] of this._groupNodes.entries()){
-            value.update()
+        for(const [_, nodes] of this._groupNodes.entries()){
+            nodes.update(dt)
         }
     }
 

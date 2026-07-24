@@ -7,119 +7,116 @@ import {Path} from "../../prefabs/Path.js";
 export class IdleState extends AbstractState{
     override readonly stateName: string = "IdleState";
     private node: BasicNode
-    private incrementArmyInterval: number
+    private lastIncrement: number
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
-        this.incrementArmyInterval = 0
+        this.lastIncrement = Number.MAX_SAFE_INTEGER
     }
 
     onBegin() {
-        this.node.clearTarget()
-        this.incrementArmyInterval = setInterval(() => {
-            this.node.incrementArmy()
-        }, 1000)
     }
 
-    onUpdate() {
+    onUpdate(dt: number) {
+        if(this.lastIncrement > 1){
+            this.node.incrementArmy()
+            this.lastIncrement = 0
+        }
+        this.lastIncrement += dt
     }
 
     onEnd() {
-        clearInterval(this.incrementArmyInterval)
     }
 }
 
 export class SendState extends AbstractState{
     override readonly stateName: string = "SendState";
     private node: BasicNode
-    private sendInterval: number
-    private incrementArmyInterval: number
+    private lastIncrement: number
+    private lastSend: number
     private path: Path | null
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
-        this.sendInterval = 0
-        this.incrementArmyInterval = 0
+        this.lastIncrement = Number.MAX_SAFE_INTEGER
+        this.lastSend = Number.MAX_SAFE_INTEGER
         this.path = null
     }
 
     onBegin() {
-        this.incrementArmyInterval = setInterval(() => {
-            this.node.incrementArmy()
-        }, 1000)
-
         this.path = this.node.getPathForTargetNode()
         if(this.path){
-            //Send immediately and wait for the interval
             Army.createNewArmy(this.path, this.node)
-
-            this.sendInterval = setInterval(() => {
-                if (this.path) Army.createNewArmy(this.path, this.node)
-            }, 1000)
+            this.lastSend = 0
         }
     }
 
-    onUpdate() {
-        if(this.path != this.node.getPathForTargetNode()){
-            clearInterval(this.sendInterval)
-            this.path = this.node.getPathForTargetNode()
-            this.sendInterval = setInterval(() => {
-                if (this.path) Army.createNewArmy(this.path, this.node)
-            }, 1000)
+    onUpdate(dt: number) {
+        if(this.lastIncrement > 1){
+            this.node.incrementArmy()
+            this.lastIncrement = 0
         }
+        this.lastIncrement += dt
+
+        if(this.lastSend > 1){
+
+            this.path = this.node.getPathForTargetNode()
+            if(this.path){
+                Army.createNewArmy(this.path, this.node)
+                this.lastSend = 0
+            }
+        }
+        this.lastSend += dt
+
     }
 
     onEnd() {
-        clearInterval(this.sendInterval)
-        clearInterval(this.incrementArmyInterval)
     }
 }
 
 export class AttackState extends AbstractState{
     override readonly stateName: string = "AttackState";
     private node: BasicNode
-    private sendInterval: number
-    private incrementArmyInterval: number
+    private lastIncrement: number
+    private lastAttack: number
     private path: Path | null
 
     constructor(node: BasicNode) {
         super();
         this.node = node;
-        this.sendInterval = 0
-        this.incrementArmyInterval = 0
+        this.lastIncrement = Number.MAX_SAFE_INTEGER
+        this.lastAttack = Number.MAX_SAFE_INTEGER
         this.path = null
     }
 
     onBegin() {
-        this.incrementArmyInterval = setInterval(() => {
-            this.node.incrementArmy()
-        }, 1000)
-
-        const path = this.node.getPathForTargetNode()
-        if(path){
-            //Send immediately and wait for the interval
-            Army.createNewArmy(path, this.node)
-
-            this.sendInterval = setInterval(() => {
-                Army.createNewArmy(path, this.node)
-            }, 1000)
+        this.path = this.node.getPathForTargetNode()
+        if(this.path){
+            Army.createNewArmy(this.path, this.node)
+            this.lastAttack = 0
         }
     }
 
-    onUpdate() {
-        if(this.path != this.node.getPathForTargetNode()){
-            clearInterval(this.sendInterval)
-            this.path = this.node.getPathForTargetNode()
-            this.sendInterval = setInterval(() => {
-                if (this.path) Army.createNewArmy(this.path, this.node)
-            }, 1000)
+    onUpdate(dt: number) {
+        if(this.lastIncrement > 1){
+            this.node.incrementArmy()
+            this.lastIncrement = 0
         }
+        this.lastIncrement += dt
+
+        if(this.lastAttack > 1){
+            this.path = this.node.getPathForTargetNode()
+            if(this.path){
+                Army.createNewArmy(this.path, this.node)
+                this.lastAttack = 0
+            }
+        }
+        this.lastAttack += dt
     }
 
     onEnd() {
-        clearInterval(this.sendInterval)
-        clearInterval(this.incrementArmyInterval)
+
     }
 }

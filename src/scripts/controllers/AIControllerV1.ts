@@ -116,7 +116,7 @@ export class AIControllerV1 implements Controller{
 
         if(primaryTargetNode){
             this.setTarget(node, primaryTargetNode)
-        }else if (secondaryNode){
+        }else if (secondaryNode && node.connectedTo.length() < maxConSec){
             this.setTarget(node, secondaryNode)
         } else {
             this.clearTarget(node)

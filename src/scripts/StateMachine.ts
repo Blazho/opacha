@@ -16,13 +16,13 @@ export class StateMachine{
      */
     private anyTransitions: Set<ITransition> = new Set();
 
-    public update(){
+    public update(dt: number){
         const transition = this.getTransition()
         if(transition){
             this.changeState(transition.to)
         }
 
-        this.current?.state.onUpdate()
+        this.current?.state.onUpdate(dt)
     }
 
     public setState(state: State){

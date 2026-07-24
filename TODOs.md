@@ -30,7 +30,8 @@
 - [x] Node can be taken when sending/attacking on same path
 - [ ] Collision detection overshoot when army moves too fast
 - [ ] Escape confirm does not reset game
-* - [ ] Nodes continue to send after game ended
+* - [x] Nodes continue to send after game ended
+* - [ ] AI still trying to process
 
 ## Optional
 

@@ -66,8 +66,8 @@ export class BasicNode {
     public getCurrentArmy() { return this.currentArmy; }
     public getSize() { return this.size; }
 
-    public update() {
-        this.stateMachine.update();
+    public update(dt: number) {
+        this.stateMachine.update(dt);
         this.updatePaths()
     }
 
