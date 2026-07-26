@@ -42,7 +42,7 @@ export class Army{
         ctx.fillText(this.count.toString(), this.position.x, this.position.y - 20)
     }
 
-    nextPosition(): Position{
+    nextPosition(dt: number): Position{
         const to = this.path.getOtherNode(this._originNode)
         if(!to){
             console.error(`Destination node does not exist`)
@@ -54,8 +54,8 @@ export class Army{
 
         length = Math.sqrt(dx*dx + dy*dy);
 
-        const nextX = this._position.x + dx / length * this.path.speed;
-        const nextY = this._position.y + dy / length * this.path.speed;
+        const nextX = this._position.x + dx / length * this.path.speed * dt;
+        const nextY = this._position.y + dy / length * this.path.speed * dt;
 
         return {x: nextX, y: nextY}
     }
@@ -64,8 +64,8 @@ export class Army{
         this._count = value;
     }
 
-    moveToNextPosition(){
-        this._position = this.nextPosition()
+    moveToNextPosition(dt: number){
+        this._position = this.nextPosition(dt)
     }
 
 

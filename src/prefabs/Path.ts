@@ -11,7 +11,7 @@ export class Path{
     public armies: UniqueSet<Army,"id">
     public speed: number
 
-    constructor(node1: BasicNode, node2: BasicNode, speed = 1) {
+    constructor(node1: BasicNode, node2: BasicNode, speed = 50) {
         this.node1 = node1;
         this.node2 = node2;
         this.armies = new UniqueSet("id")
@@ -19,10 +19,10 @@ export class Path{
         this.speed = speed
     }
 
-    update(){
+    update(dt: number){
         if(this.armies.length() === 0) return
 
-        this.moveArmies()
+        this.moveArmies(dt)
 
         this.checkArmiesForCollision()
         this.checkArmiesIfReached()
@@ -57,9 +57,9 @@ export class Path{
         return total
     }
 
-    moveArmies(){
+    moveArmies(dt: number){
         for(const [_, army] of this.armies.entries()){
-            army.moveToNextPosition()
+            army.moveToNextPosition(dt)
         }
     }
 

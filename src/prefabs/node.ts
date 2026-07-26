@@ -68,7 +68,7 @@ export class BasicNode {
 
     public update(dt: number) {
         this.stateMachine.update(dt);
-        this.updatePaths()
+        this.updatePaths(dt)
     }
 
     //todo find better way instead of string
@@ -79,10 +79,6 @@ export class BasicNode {
             return;
         }
         this.stateMachine.changeState(loadedState)
-    }
-
-    public resetCurrentArmy(){
-        this.currentArmy = 1
     }
 
     public setTargetNode(newTarget: BasicNode){
@@ -191,27 +187,15 @@ export class BasicNode {
         ctx.fillText(this.currentArmy.toString(), this.position.x, this.position.y)
     }
 
-    drawTransfer(ctx: CanvasRenderingContext2D, color: string){
-        if(this.targetNode){
-            const progress: number = (Date.now() - this.lastSendInterval ) / 1000
-            ctx.beginPath()
-            const currX = lerp(this.position.x, this.targetNode.position.x, progress)
-            const currY = lerp(this.position.y, this.targetNode.position.y, progress)
-            ctx.arc(currX, currY, 10, 0, 2 * Math.PI)
-            ctx.fillStyle = color
-            ctx.fill()
-        }
-    }
-
     drawPathAndArmies(ctx: CanvasRenderingContext2D){
         for(const [_, path] of this.connectedTo.entries()){
             path.draw(ctx)
         }
     }
 
-    private updatePaths(){
+    private updatePaths(dt: number){
         for(const [_, path] of this.connectedTo.entries()){
-            path.update()
+            path.update(dt)
         }
     }
 

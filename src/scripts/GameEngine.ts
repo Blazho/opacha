@@ -61,7 +61,6 @@ export class GameEngine{
         this.update(dt);
         this.render();
 
-        console.log("Is finished: ", this.isFinished)
         if(!this.isFinished){
             this.frameId = requestAnimationFrame(this.loop);
         } else {
