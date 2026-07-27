@@ -1,18 +1,13 @@
 import {Button} from "./Button.js";
 import {getMousePosition} from "../scripts/helpers/FHelper.js";
 import {MenuTab} from "./MenuTab.js";
-import {LEVELS, MENU_TABS} from "../scripts/config/constants.js";
+import {LEVELS, MENU_TABS, UI_SIZE} from "../scripts/config/constants.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {GameEngine} from "../scripts/GameEngine";
 
 export class MainMenu{
     private canvas : HTMLCanvasElement;
     private readonly game: GameEngine
-    private readonly buttonWidth = 200
-    private readonly buttonHeight = 80
-
-    private readonly buttonWidthS = 100
-    private readonly buttonHeightS = 80
 
     private menuTabs: UniqueSet<MenuTab, "name">
 
@@ -41,13 +36,13 @@ export class MainMenu{
         const baseTab = new MenuTab(MENU_TABS.BASE, this.canvas)
         baseTab.addButtons(
             [
-                new Button(MENU_TABS.SKIRMISH, this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
+                new Button(MENU_TABS.SKIRMISH, UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
                     this.activateTab(MENU_TABS.SKIRMISH)
                 }),
-                new Button(MENU_TABS.CAMPAIGN, this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 200}, () => {
+                new Button(MENU_TABS.CAMPAIGN, UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 200}, () => {
                     this.activateTab(MENU_TABS.CAMPAIGN)
                 }),
-                new Button(MENU_TABS.OPTIONS, this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 300}, () => {
+                new Button(MENU_TABS.OPTIONS, UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 300}, () => {
                     this.activateTab(MENU_TABS.OPTIONS)
                 })
             ]
@@ -82,10 +77,10 @@ export class MainMenu{
     private genSkirmishTab(){
         const skirmishTab = new MenuTab(MENU_TABS.SKIRMISH, this.canvas)
         skirmishTab.addButtons([
-            new Button("Back", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
+            new Button("Back", UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
                 this.activateTab(MENU_TABS.BASE)
             }),
-            new Button("Test level", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
+            new Button("Test level", UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
                 this.game.loadTestLevel()
                 this.game.start()
                 console.log("Skirmish tab")
@@ -97,7 +92,7 @@ export class MainMenu{
     private genCampaignTab(){
         const campaignTab = new MenuTab(MENU_TABS.CAMPAIGN, this.canvas)
         campaignTab.addButtons([
-            new Button("Back", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
+            new Button("Back", UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
                 this.activateTab(MENU_TABS.BASE)
             }),
                 ...this.genCampaignLvlButtons()
@@ -108,10 +103,10 @@ export class MainMenu{
     private genOptionsTab(){
         const optionsTab = new MenuTab(MENU_TABS.OPTIONS, this.canvas)
         optionsTab.addButtons([
-            new Button("Back", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
+            new Button("Back", UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y: 100}, () => {
                 this.activateTab(MENU_TABS.BASE)
             }),
-            new Button("OPTIONS TAB", this.buttonWidth, this.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
+            new Button("OPTIONS TAB", UI_SIZE.buttonWidth, UI_SIZE.buttonHeight, {x: this.calcXMiddleBtnPos(), y : 200}, () => {
         })
         ])
         this.menuTabs.add(optionsTab)
@@ -129,7 +124,7 @@ export class MainMenu{
         let index = 0
         for(const value of Object.values(LEVELS)){
             listOfBtns.push(
-                new Button(value, this.buttonWidthS, this.buttonHeightS, {x: this.calcXWithOffset(index), y: this.calcYWithOffset(index)}, () => this.game.loadLevel(value))
+                new Button(value, UI_SIZE.buttonWidthS, UI_SIZE.buttonHeightS, {x: this.calcXWithOffset(index), y: this.calcYWithOffset(index)}, () => this.game.loadLevel(value))
             )
             index++
         }
@@ -137,12 +132,12 @@ export class MainMenu{
     }
 
     private calcXMiddleBtnPos(){
-        return (this.canvas.width / 2) - (this.buttonWidth / 2)
+        return (this.canvas.width / 2) - (UI_SIZE.buttonWidth / 2)
     }
 
     private calcXWithOffset(index: number){
-        const offset = Math.floor(index % 2) * this.buttonWidthS
-        return (this.canvas.width / 2) - this.buttonWidthS + offset
+        const offset = Math.floor(index % 2) * UI_SIZE.buttonWidthS
+        return (this.canvas.width / 2) - UI_SIZE.buttonWidthS + offset
     }
 
     private calcYWithOffset(index: number){

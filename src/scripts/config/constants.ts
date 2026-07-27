@@ -18,3 +18,10 @@ export const LEVELS = {
     "TESTAI_1": "TestAI-1",
     "TESTAI_2": "TestAI-2"
 } as const
+
+export const UI_SIZE = {
+    buttonWidth: 200,
+    buttonWidthS: 100,
+    buttonHeight: 80,
+    buttonHeightS: 80
+} as const

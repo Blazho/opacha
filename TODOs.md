@@ -32,6 +32,7 @@
 - [ ] Escape confirm does not reset game
 * - [x] Nodes continue to send after game ended
 * - [ ] AI still trying to process
+- [ ] Paths are updated twice for each of the two nodes
 
 ## Optional
 

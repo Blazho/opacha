@@ -7,7 +7,7 @@ export class ControlGroup {
     public readonly name: string
     //controllable nodes
     private _groupNodes: UniqueSet<BasicNode, "id">
-    //non-controllable nodes
+    //non-controllable nodes that this group can attack
     private otherNodes: UniqueSet<BasicNode, "id">
     public readonly color: string;
 
@@ -31,13 +31,6 @@ export class ControlGroup {
 
     public init(){
         this.checkOptionalNodes()
-    }
-
-    public stopNodes(){
-        //todo
-        for(const [_, node] of this._groupNodes.entries()){
-            node.clearTarget()
-        }
     }
 
     public findNode(position: Position, checkOtherNodes = false): BasicNode | null{

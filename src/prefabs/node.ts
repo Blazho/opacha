@@ -23,7 +23,6 @@ export class BasicNode {
     isSelected = false //if player selected it
 
     private states: UniqueSet<AbstractState, "stateName">
-    private lastSendInterval: number;
 
     constructor(id: string,
                 x: number = 50,
@@ -38,7 +37,6 @@ export class BasicNode {
         this.incArmyCount = incArmyCount;
         this.currentArmy = currentArmy;
         this.targetNode = null
-        this.lastSendInterval = 0
 
         this.connectedTo = new UniqueSet<Path, "id">("id")
 
@@ -205,7 +203,6 @@ export class BasicNode {
         const sendState = new SendState(this)
         const attackState = new AttackState(this)
 
-        //todo refactor if possible
         this.states.add(idleState)
         this.states.add(sendState)
         this.states.add(attackState)
