@@ -19,8 +19,8 @@ export class AIControllerV1 implements Controller{
         }, this.decisionInterval)
     }
 
-    getGroupName(): string {
-        return this.controlGroup.name
+    getGroupId(): string {
+        return this.controlGroup.id
     }
 
     public process() {
@@ -61,7 +61,7 @@ export class AIControllerV1 implements Controller{
             const otherNode = conPath.getOtherNode(node)
             if(otherNode &&
                 otherNode.getGroup() != node.getGroup() &&
-                otherNode.getGroup()?.name != GROUP_TYPES.NEUTRAL){
+                otherNode.getGroup()?.id != GROUP_TYPES.NEUTRAL){
                 return false
             }
         }
@@ -76,7 +76,7 @@ export class AIControllerV1 implements Controller{
             const otherGroup = conPath.getOtherNode(node)
             if(otherGroup &&
                 otherGroup.getGroup() != node.getGroup() &&
-                otherGroup.getGroup()?.name != GROUP_TYPES.NEUTRAL){
+                otherGroup.getGroup()?.id != GROUP_TYPES.NEUTRAL){
                 return true
             }
         }
@@ -135,7 +135,7 @@ export class AIControllerV1 implements Controller{
 
             if(!otherGroup) continue
 
-            if(otherGroup.name === GROUP_TYPES.NEUTRAL &&
+            if(otherGroup.id === GROUP_TYPES.NEUTRAL &&
                 otherNode.getCurrentArmy() < minArmy){
                 minArmy = otherNode.getCurrentArmy()
                 targetNode = otherNode
@@ -160,8 +160,8 @@ export class AIControllerV1 implements Controller{
             const otherGroup = otherNode.getGroup()
             if(!otherGroup) continue
 
-            const totalEnemyArmy = conPath.getOtherGroupPathArmy(otherGroup.name) + otherNode.getCurrentArmy()
-            if((otherGroup.name === GROUP_TYPES.NEUTRAL || otherGroup.name !== node.getGroup()?.name) &&
+            const totalEnemyArmy = conPath.getOtherGroupPathArmy(otherGroup.id) + otherNode.getCurrentArmy()
+            if((otherGroup.id === GROUP_TYPES.NEUTRAL || otherGroup.id !== node.getGroup()?.id) &&
                 totalEnemyArmy < node.getCurrentArmy() &&
                 totalEnemyArmy < minArmy){
                 minArmy = totalEnemyArmy

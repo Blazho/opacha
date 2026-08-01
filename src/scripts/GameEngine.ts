@@ -14,7 +14,7 @@ export class GameEngine{
     private ctx: CanvasRenderingContext2D;
     private frameId: number = 0;
     private lastTime: DOMHighResTimeStamp = 0;
-    private groups: UniqueSet<ControlGroup, "name">
+    private groups: UniqueSet<ControlGroup, "id">
     private controllers: Map<string, Controller>
     private mainMenu: MainMenu
 
@@ -32,7 +32,7 @@ export class GameEngine{
             throw new Error("Failed to get Canvas 2D context.");
         }
         this.ctx = context;
-        this.groups = new UniqueSet("name")
+        this.groups = new UniqueSet("id")
         this.controllers = new Map()
         this.mainMenu = new MainMenu(this.canvas, this)
 
@@ -114,9 +114,9 @@ export class GameEngine{
     private checkForGameEnd(){
         for(const [_, group] of this.groups.entries()) {
             if (group.isDefeated()){
-                const controller = this.controllers.get(group.name)
+                const controller = this.controllers.get(group.id)
                 controller?.stop()
-                this.groups.delete(group.name)
+                this.groups.delete(group.id)
             }
         }
 
@@ -193,8 +193,8 @@ export class GameEngine{
         this.groups.add(aiControlGroup)
         this.groups.add(neutralControlGroup)
 
-        this.controllers.set(aiControlGroup.name, new AIControllerV1(aiControlGroup, 2000))
-        this.controllers.set(playerControlGroup.name, new PlayerController(this.canvas, playerControlGroup))
+        this.controllers.set(aiControlGroup.id, new AIControllerV1(aiControlGroup, 2000))
+        this.controllers.set(playerControlGroup.id, new PlayerController(this.canvas, playerControlGroup))
     }
 
     public loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
@@ -203,10 +203,10 @@ export class GameEngine{
             this.controllers = new Map()
 
             for (const [_, group] of this.groups.entries()){
-                if(group.name == GROUP_TYPES.PLAYER){
-                    this.controllers.set(group.name, new PlayerController(this.canvas, group))
-                }else if(group.name.includes("AI")){
-                    this.controllers.set(group.name, new AIControllerV1(group))
+                if(group.id == GROUP_TYPES.PLAYER){
+                    this.controllers.set(group.id, new PlayerController(this.canvas, group))
+                }else if(group.id.includes("AI")){
+                    this.controllers.set(group.id, new AIControllerV1(group))
                 }
             }
             this.start()

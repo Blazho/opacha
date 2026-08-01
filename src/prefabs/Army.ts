@@ -3,8 +3,7 @@ import {Position} from "../scripts/helpers/IHelper.js";
 import {Path} from "./Path.js";
 import {ControlGroup} from "../scripts/node/ControlGroup.js";
 
-export class Army{
-    public readonly id: string
+export class Army extends RenderObject{
     private readonly _originNode: BasicNode
     private readonly _controlGroup: ControlGroup
     static readonly radius = 10
@@ -13,17 +12,17 @@ export class Army{
     private _position: Position
 
     constructor(originNode: BasicNode, path: Path) {
+        super(originNode.getId() + Date.now())
         this._originNode = originNode;
         this._count = originNode.getCurrentArmy();
         this.path = path
         this._position = {x: originNode.getPosition().x, y: originNode.getPosition().y}
         this._controlGroup = originNode.getGroup() ?? new ControlGroup("Neutral", "gray")
-        this.id = originNode.getId() + Date.now()
 
         path.addArmy(this)
     }
 
-    draw(ctx: CanvasRenderingContext2D){
+    render(ctx: CanvasRenderingContext2D){
         ctx.beginPath()
         ctx.arc(this._position.x, this._position.y, Army.radius, 0, 2 * Math.PI)
         const group = this.group
@@ -64,7 +63,7 @@ export class Army{
         this._count = value;
     }
 
-    moveToNextPosition(dt: number){
+    update(dt: number){
         this._position = this.nextPosition(dt)
     }
 

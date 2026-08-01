@@ -4,18 +4,17 @@ import {inRadius} from "../scripts/helpers/FHelper.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {Position} from "../scripts/helpers/IHelper";
 
-export class Path{
-    public id: string
+export class Path extends RenderObject{
     public node1: BasicNode
     public node2: BasicNode
     public armies: UniqueSet<Army,"id">
     public speed: number
 
     constructor(node1: BasicNode, node2: BasicNode, speed = 50) {
+        super(node1.id + "-" + node2.id);
         this.node1 = node1;
         this.node2 = node2;
         this.armies = new UniqueSet("id")
-        this.id = node1.id + "-" + node2.id;
         this.speed = speed
     }
 
@@ -29,7 +28,7 @@ export class Path{
         this.removeDeadArmies()
     }
 
-    draw(ctx: CanvasRenderingContext2D){
+    render(ctx: CanvasRenderingContext2D){
         this.drawPath(ctx)
         this.drawArmies(ctx)
     }
@@ -50,7 +49,7 @@ export class Path{
     getOtherGroupPathArmy(groupName: string){
         let total = 0
         for(const [_, army] of this.armies.entries()){
-            if(army.group.name === groupName){
+            if(army.group.id === groupName){
                 total += army.count
             }
         }
@@ -59,7 +58,7 @@ export class Path{
 
     moveArmies(dt: number){
         for(const [_, army] of this.armies.entries()){
-            army.moveToNextPosition(dt)
+            army.update(dt)
         }
     }
 
@@ -115,7 +114,7 @@ export class Path{
 
     private drawArmies(ctx: CanvasRenderingContext2D){
         for(const [_, army] of this.armies.entries()){
-            army.draw(ctx)
+            army.render(ctx)
         }
     }
 

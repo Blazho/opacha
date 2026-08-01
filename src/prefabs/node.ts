@@ -9,8 +9,7 @@ import {Path} from "./Path";
 import {IBasicNode} from "../configs/filesStructures";
 
 //todo separate structure from render
-export class BasicNode {
-    public readonly id: string; //for helping find duplicates
+export class BasicNode extends RenderObject{
     private readonly position: Position
     private readonly size: number
     private currentArmy: number
@@ -31,7 +30,7 @@ export class BasicNode {
                 currentArmy: number = 0,
                 radius: number = 50,
     ) {
-        this.id = id
+        super(id)
         this.position = { x: x, y: y}
         this.size = radius;
         this.incArmyCount = incArmyCount;
@@ -153,17 +152,17 @@ export class BasicNode {
     }
 
     toString(){
-        return `${this.id} - ${this.group?.name}`
+        return `${this.id} - ${this.group?.id}`
     }
 
-    drawNode(ctx: CanvasRenderingContext2D, color: string) {
+    render(ctx: CanvasRenderingContext2D) {
         let circleColor: Pair<string, string> = {
-            left: color,
+            left: this.group?.color || "#ccc",
             right: 'black'
         }
         if(this.isSelected){
             circleColor = {
-                left: lightenColor(color, 40),
+                left: lightenColor(this.group?.color || "#ccc", 40),
                 right: 'black'
             }
         }
@@ -186,8 +185,9 @@ export class BasicNode {
     }
 
     drawPathAndArmies(ctx: CanvasRenderingContext2D){
+        //todo refactor to use render engine
         for(const [_, path] of this.connectedTo.entries()){
-            path.draw(ctx)
+            path.render(ctx)
         }
     }
 
@@ -208,17 +208,17 @@ export class BasicNode {
         this.states.add(attackState)
 
         this.stateMachine.addTransition(idleState, sendState, new Predicate(() => {
-            return this.targetNode !== null && this.targetNode.getGroup()?.name === this.group?.name
+            return this.targetNode !== null && this.targetNode.getGroup()?.id === this.group?.id
         }))
         this.stateMachine.addTransition(idleState, attackState, new Predicate(() => {
-            return this.targetNode !== null && this.targetNode.getGroup()?.name !== this.group?.name
+            return this.targetNode !== null && this.targetNode.getGroup()?.id !== this.group?.id
         }))
         this.stateMachine.addTransition(sendState, idleState, new Predicate(() => {
-            return this.targetNode === null || this.group?.name !== this.targetNode.group?.name
+            return this.targetNode === null || this.group?.id !== this.targetNode.group?.id
         }))
         this.stateMachine.addTransition(attackState, idleState, new Predicate(() => this.targetNode === null))
         this.stateMachine.addTransition(attackState, sendState, new Predicate(() => {
-            return this.targetNode !== null && this.group?.name === this.targetNode.group?.name
+            return this.targetNode !== null && this.group?.id === this.targetNode.group?.id
         }))
     }
 }

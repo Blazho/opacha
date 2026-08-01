@@ -21,7 +21,7 @@ export async function fetchLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
     }
 }
 
-export function parseJsonLevel(levelRaw: ILevel): UniqueSet<ControlGroup, "name">{
+export function parseJsonLevel(levelRaw: ILevel): UniqueSet<ControlGroup, "id">{
     const name = levelRaw.level
     const nodesRaw = levelRaw.nodes
     const groupsRaw = levelRaw.groups
@@ -33,6 +33,21 @@ export function parseJsonLevel(levelRaw: ILevel): UniqueSet<ControlGroup, "name"
         group.init()
     }
     return groups
+
+}
+
+export function pareJsonLevelTmp(levelRaw: ILevel):any {
+    const name = levelRaw.level
+    const nodesRaw = levelRaw.nodes
+    const groupsRaw = levelRaw.groups
+    const pathsRaw = levelRaw.paths
+
+    const nodes = createNodes(nodesRaw)
+
+    /**
+     * render: nodes, path, army
+     * physic: nodes, path, army, group
+     * **/
 
 }
 
@@ -61,7 +76,7 @@ function createGroup(groupRaw: IControlGroup, nodes: UniqueSet<BasicNode,"id">){
 }
 
 function createAllGroups(groupsRaw: IControlGroup[], nodes: UniqueSet<BasicNode, "id">){
-    const groups = new UniqueSet<ControlGroup, "name">("name")
+    const groups = new UniqueSet<ControlGroup, "id">("id")
     for(const groupRaw of groupsRaw){
         const group = createGroup(groupRaw, nodes)
         groups.add(group)

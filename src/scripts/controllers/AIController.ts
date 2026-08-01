@@ -16,12 +16,12 @@ export class AIController implements Controller{
         }, this.decisionInterval)
     }
 
-    getGroupName(): string {
-        return this.controlGroup.name
+    getGroupId(): string {
+        return this.controlGroup.id
     }
 
     stop(): void {
-        console.log(`${this.getGroupName()} stopped`)
+        console.log(`${this.getGroupId()} stopped`)
         clearInterval(this.processInterval)
     }
 

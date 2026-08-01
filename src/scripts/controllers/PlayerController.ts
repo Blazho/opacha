@@ -37,8 +37,8 @@ export class PlayerController implements Controller{
         this.setDBClickListener()
     }
 
-    getGroupName(): string {
-        return this.playerGroup.name
+    getGroupId(): string {
+        return this.playerGroup.id
     }
 
     process(): void {

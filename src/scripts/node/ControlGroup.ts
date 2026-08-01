@@ -3,16 +3,15 @@ import {BasicNode} from "../../prefabs/node.js";
 import {Position} from "../helpers/IHelper";
 import {Path} from "../../prefabs/Path.js";
 
-export class ControlGroup {
-    public readonly name: string
+export class ControlGroup extends GameObject{
     //controllable nodes
     private _groupNodes: UniqueSet<BasicNode, "id">
     //non-controllable nodes that this group can attack
     private otherNodes: UniqueSet<BasicNode, "id">
     public readonly color: string;
 
-    constructor(name: string, color: string) {
-        this.name = name
+    constructor(id: string, color: string) {
+        super(id)
         this.color = color
         this._groupNodes = new UniqueSet<BasicNode, "id">("id")
         this.otherNodes = new UniqueSet<BasicNode, "id">("id")
@@ -70,7 +69,7 @@ export class ControlGroup {
     }
 
     public toString(){
-        console.log(`${this.name} nodes: `, this._groupNodes)
+        console.log(`${this.id} nodes: `, this._groupNodes)
     }
 
     //todo draws duplicates
@@ -82,7 +81,7 @@ export class ControlGroup {
 
     drawNodes(ctx: CanvasRenderingContext2D) {
         for(const [_, node] of this._groupNodes.entries()){
-            node.drawNode(ctx, this.color)
+            node.render(ctx)
         }
     }
 
