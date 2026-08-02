@@ -3,6 +3,9 @@ import {IBasicNode, IControlGroup, ILevel, IPath} from "./filesStructures";
 import {BasicNode} from "../prefabs/node.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {ControlGroup} from "../scripts/node/ControlGroup.js";
+import {Path} from "../prefabs/Path.js";
+import {GameObject, RenderObject} from "../scripts/render/RenderObject.js";
+import {LevelData} from "../scripts/helpers/IHelper";
 
 export async function fetchLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
     try {
@@ -36,19 +39,42 @@ export function parseJsonLevel(levelRaw: ILevel): UniqueSet<ControlGroup, "id">{
 
 }
 
-export function pareJsonLevelTmp(levelRaw: ILevel):any {
+export function pareJsonLevel(levelRaw: ILevel):LevelData {
     const name = levelRaw.level
     const nodesRaw = levelRaw.nodes
     const groupsRaw = levelRaw.groups
     const pathsRaw = levelRaw.paths
 
-    const nodes = createNodes(nodesRaw)
+    const renderObjects = new UniqueSet<RenderObject, "id">("id")
+    const gameObjects = new UniqueSet<GameObject, "id">("id")
 
-    /**
-     * render: nodes, path, army
-     * physic: nodes, path, army, group
-     * **/
+    const nodeSet = createNodes(nodesRaw)
+    for(const [_, node] of nodeSet.entries()){
+        renderObjects.add(node)
+        gameObjects.add(node)
+    }
 
+    const pathSet = connectAllNodes(pathsRaw, nodeSet)
+    if(!pathSet){
+        throw Error("Cannot create paths")
+    }
+    for(const [_, path] of pathSet.entries()){
+        renderObjects.add(path)
+        gameObjects.add(path)
+    }
+
+    const groups = createAllGroups(groupsRaw, nodeSet)
+    for(const [_, group] of groups.entries()){
+        group.init()
+        gameObjects.add(group)
+    }
+
+    return {
+        renderObjects: renderObjects,
+        gameObjects: gameObjects,
+        groups: groups,
+        levelName: name
+    }
 }
 
 function createNodes(nodes: IBasicNode[]): UniqueSet<BasicNode, "id">{
@@ -85,6 +111,7 @@ function createAllGroups(groupsRaw: IControlGroup[], nodes: UniqueSet<BasicNode,
 }
 
 function connectAllNodes(pathsRaw: IPath[], nodes: UniqueSet<BasicNode, "id">){
+    const paths = new UniqueSet<Path, "id">("id")
     for(const path of pathsRaw){
         const node1 = nodes.get(path.node1)
         const node2 = nodes.get(path.node2)
@@ -92,6 +119,8 @@ function connectAllNodes(pathsRaw: IPath[], nodes: UniqueSet<BasicNode, "id">){
             console.error(`Nodes ${path.node1} and/or ${path.node2} does not exist`)
             return
         }
-        ControlGroup.addConnection(node1, node2)
+        const connectingPath = ControlGroup.addConnection(node1, node2)
+        paths.add(connectingPath)
     }
+    return paths
 }

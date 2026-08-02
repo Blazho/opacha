@@ -6,21 +6,24 @@ import {BasicNode} from "../prefabs/node.js";
 import {AIControllerV1} from "./controllers/AIControllerV1.js";
 import {PlayerController} from "./controllers/PlayerController.js";
 import {GROUP_TYPES, LEVELS, MENU_TABS} from "./config/constants.js";
-import {fetchLevel, parseJsonLevel} from "../configs/dataLoader.js";
+import {fetchLevel, pareJsonLevel, parseJsonLevel} from "../configs/dataLoader.js";
 import {ILevel} from "../configs/filesStructures.js";
+import {RenderEngine} from "./render/RenderEngine.js";
+import {GameObject} from "./render/RenderObject.js";
 
 export class GameEngine{
     private canvas: HTMLCanvasElement;
-    private ctx: CanvasRenderingContext2D;
     private frameId: number = 0;
     private lastTime: DOMHighResTimeStamp = 0;
-    private groups: UniqueSet<ControlGroup, "id">
     private controllers: Map<string, Controller>
     private mainMenu: MainMenu
+    private renderEngine: RenderEngine
+    private gameObjects: UniqueSet<GameObject, "id">
+    private static instance: GameEngine | null = null
 
     private isFinished = false
 
-    constructor(canvasId: string) {
+    private constructor(canvasId: string) {
         const el = document.getElementById(canvasId);
         if (!(el instanceof HTMLCanvasElement)) {
             throw new Error(`Element #${canvasId} is not a valid Canvas.`);
@@ -31,12 +34,33 @@ export class GameEngine{
         if (!context) {
             throw new Error("Failed to get Canvas 2D context.");
         }
-        this.ctx = context;
-        this.groups = new UniqueSet("id")
         this.controllers = new Map()
-        this.mainMenu = new MainMenu(this.canvas, this)
+        GameEngine.instance = this
+        this.mainMenu = new MainMenu(this.canvas)
+        this.renderEngine = RenderEngine.init(this.canvas)
+        this.gameObjects = new UniqueSet("id")
 
         this.mainMenu.load()
+    }
+
+    public static init(canvasId: string){
+        console.log("Initializing GameEngine")
+        if(GameEngine.instance){
+            throw new Error("GameEngine already initialized")
+        }
+        new GameEngine(canvasId)
+        return GameEngine.instance
+    }
+
+    public static getInstance(){
+        if(!GameEngine.instance){
+            throw new Error("[GameEngine] must be initialized with init before calling getInstance")
+        }
+        return GameEngine.instance
+    }
+
+    public addGameObject(gameObj: GameObject){
+        this.gameObjects.add(gameObj)
     }
 
     public start(): void {
@@ -59,13 +83,13 @@ export class GameEngine{
         this.lastTime = timestamp;
 
         this.update(dt);
-        this.render();
+        this.renderEngine.render()
 
         if(!this.isFinished){
             this.frameId = requestAnimationFrame(this.loop);
         } else {
             this.stop()
-            this.groups.clear()
+            this.gameObjects.clear()
             this.controllers.clear()
             this.mainMenu.activateTab(MENU_TABS.BASE)
         }
@@ -74,22 +98,9 @@ export class GameEngine{
     private update(dt: number){
         this.isFinished = this.checkForGameEnd()
 
-        for(const [_, group] of this.groups.entries()){
-            group.update(dt)
+        for(const [_, gameObj] of this.gameObjects.entries()){
+            gameObj.update(dt)
         }
-    }
-
-    private render(){
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
-        for(const [_, group] of this.groups.entries()){
-            group.drawNodesPathsAndArmies(this.ctx)
-        }
-
-        for(const [_, group] of this.groups.entries()){
-            group.drawNodes(this.ctx)
-        }
-
     }
 
     private initCanvas(){
@@ -112,97 +123,40 @@ export class GameEngine{
     }
 
     private checkForGameEnd(){
-        for(const [_, group] of this.groups.entries()) {
-            if (group.isDefeated()){
-                const controller = this.controllers.get(group.id)
-                controller?.stop()
-                this.groups.delete(group.id)
+        let groupCount = 0
+        for(const [_, gameObj] of this.gameObjects.entries()){
+            if(gameObj instanceof ControlGroup){
+                groupCount++
+                if(gameObj.isDefeated()){
+                    const controller = this.controllers.get(gameObj.id)
+                    controller?.stop()
+                    groupCount --
+                    this.gameObjects.delete(gameObj.id)
+                }
             }
         }
 
-        if(this.groups.length() <= 1){
-            // this.stop()
-            // // alert(`Player ${this.groups.toList()[0].name} won`)
-            // console.log(`Player ${this.groups.toList()[0].name} won`)
-            // this.mainMenu.activateTab(MENU_TABS.BASE)
-            return true
-        }
-        return  false
+        return  groupCount <= 1
     }
 
     public loadTestLevel(){
-        const pn1 = new BasicNode("pn1", 100, 100, 1, 20)
-
-        const nn1 = new BasicNode("nn1", 300, 100, 0, 10)
-        const nn2 = new BasicNode("nn2", 100, 250, 0, 10)
-        const nn3 = new BasicNode("nn3", 300, 250, 0, 10)
-        const nn4 = new BasicNode("nn4", 500, 400, 0, 10)
-
-        const nn5 = new BasicNode("nn5", 600, 500, 0, 10)
-
-        const nn6 = new BasicNode("nn6", 700, 600, 0, 10)
-        const nn7 = new BasicNode("nn7", 900, 750, 0, 10)
-        const nn8 = new BasicNode("nn8", 1100, 750, 0, 10)
-        const nn9 = new BasicNode("nn9", 900, 900, 0, 10)
-
-        const ain1 = new BasicNode("ain1", 1100, 900, 1, 20)
-        //init control groups
-        const neutralControlGroup = new ControlGroup("Neutral", "#6E6E6EFF")
-        const playerControlGroup = new ControlGroup("Player", "#0000ff")
-        const aiControlGroup = new ControlGroup("AIGroup", "#FFA500")
-
-        //add nodes to groups
-        playerControlGroup
-            .addNode(pn1)
-
-        neutralControlGroup
-            .addNode(nn1)
-            .addNode(nn2)
-            .addNode(nn3)
-            .addNode(nn4)
-            .addNode(nn5)
-            .addNode(nn6)
-            .addNode(nn7)
-            .addNode(nn8)
-            .addNode(nn9)
-
-
-        aiControlGroup
-            .addNode(ain1)
-
-        //paths
-        ControlGroup.addConnection(pn1, nn1)
-        ControlGroup.addConnection(pn1, nn2)
-
-        ControlGroup.addConnection(nn1, nn3)
-        ControlGroup.addConnection(nn2, nn3)
-        ControlGroup.addConnection(nn3, nn4)
-        ControlGroup.addConnection(nn4, nn5)
-        ControlGroup.addConnection(nn5, nn6)
-        ControlGroup.addConnection(nn6, nn7)
-        ControlGroup.addConnection(nn7, nn8)
-        ControlGroup.addConnection(nn7, nn9)
-
-        ControlGroup.addConnection(ain1, nn8)
-        ControlGroup.addConnection(ain1, nn9)
-
-        playerControlGroup.init()
-        aiControlGroup.init()
-
-        this.groups.add(playerControlGroup)
-        this.groups.add(aiControlGroup)
-        this.groups.add(neutralControlGroup)
-
-        this.controllers.set(aiControlGroup.id, new AIControllerV1(aiControlGroup, 2000))
-        this.controllers.set(playerControlGroup.id, new PlayerController(this.canvas, playerControlGroup))
+        //todo
+        throw new Error("Level not implemented")
     }
 
     public loadLevel(levelName: typeof LEVELS[keyof typeof LEVELS]){
         fetchLevel(levelName).then(r=> {
-            this.groups = parseJsonLevel(r as ILevel)
+            const levelData = pareJsonLevel(r as ILevel)
+
+            this.renderEngine.setRenderObjects(levelData.renderObjects)
+            this.gameObjects.clear()
+            for(const [_, gameObj] of levelData.gameObjects.entries()){
+                this.gameObjects.add(gameObj)
+            }
+
             this.controllers = new Map()
 
-            for (const [_, group] of this.groups.entries()){
+            for (const [_, group] of levelData.groups.entries()){
                 if(group.id == GROUP_TYPES.PLAYER){
                     this.controllers.set(group.id, new PlayerController(this.canvas, group))
                 }else if(group.id.includes("AI")){

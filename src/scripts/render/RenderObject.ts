@@ -1,4 +1,4 @@
-abstract class GameObject {
+export abstract class GameObject {
     readonly id: string
     abstract update(dt: number): void
 
@@ -7,7 +7,7 @@ abstract class GameObject {
     }
 }
 
-abstract class RenderObject extends GameObject{
+export abstract class RenderObject extends GameObject{
     abstract render(context:CanvasRenderingContext2D):void;
 }
 

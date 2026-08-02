@@ -1,7 +1,8 @@
 import {UniqueSet} from "../helpers/UniqueSet.js";
 import {BasicNode} from "../../prefabs/node.js";
-import {Position} from "../helpers/IHelper";
+import {Position} from "../helpers/IHelper.js";
 import {Path} from "../../prefabs/Path.js";
+import {GameObject} from "../render/RenderObject.js";
 
 export class ControlGroup extends GameObject{
     //controllable nodes
@@ -57,6 +58,8 @@ export class ControlGroup extends GameObject{
         const path = new Path(node1, node2)
         node1.addPath(path)
         node2.addPath(path)
+
+        return path
     }
 
     public update(dt: number){

@@ -3,12 +3,12 @@ import {AttackState, IdleState, SendState} from "../scripts/node/NodeStates.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {AbstractState} from "../scripts/FiniteStateScript";
 import {Pair, Position} from "../scripts/helpers/IHelper";
-import {inRadius, lerp, lightenColor} from "../scripts/helpers/FHelper.js";
-import {ControlGroup} from "../scripts/node/ControlGroup";
-import {Path} from "./Path";
-import {IBasicNode} from "../configs/filesStructures";
+import {inRadius, lightenColor} from "../scripts/helpers/FHelper.js";
+import {ControlGroup} from "../scripts/node/ControlGroup.js";
+import {Path} from "./Path.js";
+import {IBasicNode} from "../configs/filesStructures.js";
+import {RenderObject} from "../scripts/render/RenderObject.js";
 
-//todo separate structure from render
 export class BasicNode extends RenderObject{
     private readonly position: Position
     private readonly size: number

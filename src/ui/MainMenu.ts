@@ -3,7 +3,7 @@ import {getMousePosition} from "../scripts/helpers/FHelper.js";
 import {MenuTab} from "./MenuTab.js";
 import {LEVELS, MENU_TABS, UI_SIZE} from "../scripts/config/constants.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
-import {GameEngine} from "../scripts/GameEngine";
+import {GameEngine} from "../scripts/GameEngine.js";
 
 export class MainMenu{
     private canvas : HTMLCanvasElement;
@@ -11,9 +11,9 @@ export class MainMenu{
 
     private menuTabs: UniqueSet<MenuTab, "name">
 
-    constructor(canvas: HTMLCanvasElement, game: GameEngine) {
+    constructor(canvas: HTMLCanvasElement) {
         this.canvas  = canvas;
-        this.game = game
+        this.game = GameEngine.getInstance()
         this.menuTabs = new UniqueSet<MenuTab, "name">("name")
     }
 

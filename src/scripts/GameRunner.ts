@@ -4,4 +4,4 @@ import {GameEngine} from "./GameEngine.js";
 
 const app = document.getElementById("app")
 
-const game = new GameEngine("canvas")
+const game = GameEngine.init("canvas")

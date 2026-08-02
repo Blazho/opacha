@@ -22,33 +22,38 @@
 - [x] Selected node indicator broken
 - [x] Nodes current army is not shown
 - [x] Taking nodes should reset the increment of the army
-- [ ] Cant directly change target when the node is already sending
+- [x] Cant directly change target when the node is already sending
 * - [x] Change from one attack node to other attack node
 * - [x] Change from one supply node to other supply node
-* - [ ] Change from one attack node to other supply node
-* - [ ] Change from one supply node to other attack node
+* - [x] Change from one attack node to other supply node
+* - [x] Change from one supply node to other attack node
 - [x] Node can be taken when sending/attacking on same path
 - [ ] Collision detection overshoot when army moves too fast
 - [ ] Escape confirm does not reset game
 * - [x] Nodes continue to send after game ended
 * - [ ] AI still trying to process
-- [ ] Paths are updated twice for each of the two nodes
+- [x] Paths are updated twice for each of the two nodes
 
 ## Optional
 
 - [x] Implementation: Attacking should send physical attack circle and not only visual 
-- [ ] Render system
+- [x] Render system
 - [ ] Change speed of the game or pause
 - [ ] More type of nodes
+- * [x] Basic Passive army increment
+- * [ ] Defensive %/flat
+- * [ ] Income increment depends on number of connections
+- * [ ] Army draft - draft army instantly with cost
+- * [ ] Random
 - [x] Path mechanics
 - [ ] Optimize num.1
 * - [ ] Optimize army logic
-* - [ ] Optimize draw paths
+* - [x] Optimize draw paths
 * - [ ] checkOptionalNodes::ControlGroup - optimise
 - [ ] Map creation tool
 - [ ] Level data fetching position in app
-- [ ] Move update logic from render to update
-
+- [x] Move update logic from render to update
+- [ ] Test level
 ## Improvements
 - [ ] End game screen
 - [ ] Main menu look
@@ -58,4 +63,4 @@
 
 -----------------------------
 ### Code styles
-- [ ] Private functions at end of class
+-  Private functions at end of class

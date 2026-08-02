@@ -2,6 +2,8 @@ import {BasicNode} from "./node.js";
 import {Position} from "../scripts/helpers/IHelper.js";
 import {Path} from "./Path.js";
 import {ControlGroup} from "../scripts/node/ControlGroup.js";
+import {RenderObject} from "../scripts/render/RenderObject.js";
+import {GameEngine} from "../scripts/GameEngine.js";
 
 export class Army extends RenderObject{
     private readonly _originNode: BasicNode
@@ -11,7 +13,7 @@ export class Army extends RenderObject{
     private path: Path
     private _position: Position
 
-    constructor(originNode: BasicNode, path: Path) {
+    private constructor(originNode: BasicNode, path: Path) {
         super(originNode.getId() + Date.now())
         this._originNode = originNode;
         this._count = originNode.getCurrentArmy();
@@ -88,5 +90,6 @@ export class Army extends RenderObject{
         const army = new Army(from, path)
         path.addArmy(army)
         from.decrementArmy(from.getCurrentArmy())
+        GameEngine.getInstance().addGameObject(army)
     }
 }

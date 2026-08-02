@@ -2,7 +2,8 @@ import {BasicNode} from "./node.js";
 import {Army} from "./Army.js";
 import {inRadius} from "../scripts/helpers/FHelper.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
-import {Position} from "../scripts/helpers/IHelper";
+import {Position} from "../scripts/helpers/IHelper.js";
+import {RenderObject} from "../scripts/render/RenderObject.js";
 
 export class Path extends RenderObject{
     public node1: BasicNode
@@ -10,7 +11,7 @@ export class Path extends RenderObject{
     public armies: UniqueSet<Army,"id">
     public speed: number
 
-    constructor(node1: BasicNode, node2: BasicNode, speed = 50) {
+    constructor(node1: BasicNode, node2: BasicNode, speed = 25) {
         super(node1.id + "-" + node2.id);
         this.node1 = node1;
         this.node2 = node2;
