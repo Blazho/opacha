@@ -44,6 +44,10 @@ export class RenderEngine{
         this.renderObjects.delete(renderObject.id);
     }
 
+    public clearRenderObjects(){
+        this.renderObjects.clear()
+    }
+
     public render(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 

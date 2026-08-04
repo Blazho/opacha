@@ -90,6 +90,7 @@ export class GameEngine{
         } else {
             this.stop()
             this.gameObjects.clear()
+            this.renderEngine.clearRenderObjects()
             this.controllers.clear()
             this.mainMenu.activateTab(MENU_TABS.BASE)
         }

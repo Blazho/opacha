@@ -11,7 +11,7 @@ export class Path extends RenderObject{
     public armies: UniqueSet<Army,"id">
     public speed: number
 
-    constructor(node1: BasicNode, node2: BasicNode, speed = 25) {
+    constructor(node1: BasicNode, node2: BasicNode, speed = 50) {
         super(node1.id + "-" + node2.id);
         this.node1 = node1;
         this.node2 = node2;

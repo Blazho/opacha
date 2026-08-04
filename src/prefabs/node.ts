@@ -65,7 +65,6 @@ export class BasicNode extends RenderObject{
 
     public update(dt: number) {
         this.stateMachine.update(dt);
-        this.updatePaths(dt)
     }
 
     //todo find better way instead of string
@@ -182,19 +181,6 @@ export class BasicNode extends RenderObject{
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.fillText(this.currentArmy.toString(), this.position.x, this.position.y)
-    }
-
-    drawPathAndArmies(ctx: CanvasRenderingContext2D){
-        //todo refactor to use render engine
-        for(const [_, path] of this.connectedTo.entries()){
-            path.render(ctx)
-        }
-    }
-
-    private updatePaths(dt: number){
-        for(const [_, path] of this.connectedTo.entries()){
-            path.update(dt)
-        }
     }
 
     private initPossibleStates(){

@@ -63,29 +63,10 @@ export class ControlGroup extends GameObject{
     }
 
     public update(dt: number){
-        if(this._groupNodes.length() === 0){
-            return
-        }
-        for(const [_, nodes] of this._groupNodes.entries()){
-            nodes.update(dt)
-        }
     }
 
     public toString(){
         console.log(`${this.id} nodes: `, this._groupNodes)
-    }
-
-    //todo draws duplicates
-    public drawNodesPathsAndArmies(ctx: CanvasRenderingContext2D){
-        for(const [_, node] of this._groupNodes.entries()){
-            node.drawPathAndArmies(ctx)
-        }
-    }
-
-    drawNodes(ctx: CanvasRenderingContext2D) {
-        for(const [_, node] of this._groupNodes.entries()){
-            node.render(ctx)
-        }
     }
 
     takeNode(node: BasicNode) {
