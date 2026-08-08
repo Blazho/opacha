@@ -5,12 +5,10 @@ import {Position} from "../scripts/helpers/IHelper";
 export class MenuTab{
     readonly name;
     private buttons: Button[];
-    private canvas : HTMLCanvasElement;
     public isActive: boolean
 
     constructor(name: string, canvas: HTMLCanvasElement) {
         this.name = name
-        this.canvas = canvas
         this.isActive = false
         this.buttons = []
     }
@@ -23,14 +21,9 @@ export class MenuTab{
         this.isActive = true
     }
 
-    public draw(){
-        const ctx = this.canvas.getContext("2d");
-        if(ctx){
-            for(const btn of this.buttons){
-                btn.draw(ctx)
-            }
-        }else {
-            console.error("Could not get context for canvas")
+    public draw(ctx: CanvasRenderingContext2D){
+        for(const btn of this.buttons){
+            btn.draw(ctx)
         }
     }
 

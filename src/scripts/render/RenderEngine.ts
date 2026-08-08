@@ -50,9 +50,10 @@ export class RenderEngine{
 
     public render(){
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-
         for(const [_, renderObject] of this.renderObjects.entries()){
-            renderObject.render(this.ctx)
+            if(renderObject.isActive){
+                renderObject.render(this.ctx)
+            }
         }
     }
 }

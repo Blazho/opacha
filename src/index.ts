@@ -23,9 +23,9 @@ if (!context) {
     throw new Error("Failed to get Canvas 2D context.");
 }
 const gameEngine = GameEngine.init("canvas")
-const uiEngine = UIEngine.init(canvas)
+const uiEngine = UIEngine.getInstance()
 
-uiEngine.activate(SCREENS.MAIN_MENU)
 
+gameEngine.start()
 
 

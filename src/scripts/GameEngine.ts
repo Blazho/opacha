@@ -1,23 +1,22 @@
 import {UniqueSet} from "./helpers/UniqueSet.js";
 import {ControlGroup} from "./node/ControlGroup.js";
 import {Controller} from "./controllers/Controller.js";
-import {MainMenu} from "../ui/MainMenu.js";
-import {BasicNode} from "../prefabs/node.js";
 import {AIControllerV1} from "./controllers/AIControllerV1.js";
 import {PlayerController} from "./controllers/PlayerController.js";
-import {GROUP_TYPES, LEVELS, MENU_TABS} from "./config/constants.js";
-import {fetchLevel, pareJsonLevel, parseJsonLevel} from "../configs/dataLoader.js";
+import {GROUP_TYPES, LEVELS, SCREENS} from "./config/constants.js";
+import {fetchLevel, pareJsonLevel} from "../configs/dataLoader.js";
 import {ILevel} from "../configs/filesStructures.js";
 import {RenderEngine} from "./render/RenderEngine.js";
 import {GameObject} from "./render/RenderObject.js";
+import {UIEngine} from "./render/UIEngine.js";
 
 export class GameEngine{
     private canvas: HTMLCanvasElement;
     private frameId: number = 0;
     private lastTime: DOMHighResTimeStamp = 0;
     private controllers: Map<string, Controller>
-    private mainMenu: MainMenu
     private renderEngine: RenderEngine
+    private uiEngine: UIEngine
     private gameObjects: UniqueSet<GameObject, "id">
     private static instance: GameEngine | null = null
 
@@ -36,11 +35,11 @@ export class GameEngine{
         }
         this.controllers = new Map()
         GameEngine.instance = this
-        this.mainMenu = new MainMenu(this.canvas)
         this.renderEngine = RenderEngine.init(this.canvas)
+        this.uiEngine = UIEngine.init(this.canvas)
         this.gameObjects = new UniqueSet("id")
 
-        // this.mainMenu.load()
+        this.uiEngine.activate(SCREENS.MAIN_MENU)
     }
 
     public static init(canvasId: string){
@@ -48,7 +47,7 @@ export class GameEngine{
         if(GameEngine.instance){
             throw new Error("GameEngine already initialized")
         }
-        new GameEngine(canvasId)
+        GameEngine.instance = new GameEngine(canvasId)
         return GameEngine.instance
     }
 
@@ -84,43 +83,27 @@ export class GameEngine{
 
         this.update(dt);
         this.renderEngine.render()
-
-        if(!this.isFinished){
-            this.frameId = requestAnimationFrame(this.loop);
-        } else {
-            this.stop()
+        //todo
+        if(this.uiEngine.getActiveScreen() == SCREENS.GAME_UI_SCREEN && this.isFinished){
+            console.log("GAME FINISHED")
+            // this.stop()
             this.gameObjects.clear()
             this.renderEngine.clearRenderObjects()
             this.controllers.clear()
-            this.mainMenu.activateTab(MENU_TABS.BASE)
+            this.uiEngine.activate(SCREENS.MAIN_MENU)
         }
+
+        this.frameId = requestAnimationFrame(this.loop)
     };
 
     private update(dt: number){
         this.isFinished = this.checkForGameEnd()
 
         for(const [_, gameObj] of this.gameObjects.entries()){
-            gameObj.update(dt)
+            if(gameObj.isActive){
+                gameObj.update(dt)
+            }
         }
-    }
-
-    private initCanvas(){
-        //Creates canvas when container is provided
-        // this.canvas = document.createElement('canvas')
-        //
-        // this.canvas.style.border = "1px solid black"
-        //
-        // this.canvas.width = 1920
-        // this.canvas.height = 1080
-        //
-        // this.container.appendChild(this.canvas)
-        //
-        // const ctx = this.canvas.getContext("2d")
-        // if(ctx){
-        //     this.context = ctx
-        // }else {
-        //     console.error("Could not get context")
-        // }
     }
 
     private checkForGameEnd(){
@@ -136,7 +119,6 @@ export class GameEngine{
                 }
             }
         }
-
         return  groupCount <= 1
     }
 
@@ -165,6 +147,8 @@ export class GameEngine{
                 }
             }
             this.start()
+            //todo review
+            this.uiEngine.activate(SCREENS.GAME_UI_SCREEN)
         })
 
     }

@@ -4,9 +4,9 @@ import {MenuTab} from "./MenuTab.js";
 import {LEVELS, MENU_TABS, SCREENS, UI_SIZE} from "../scripts/config/constants.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {GameEngine} from "../scripts/GameEngine.js";
-import {UIScreen} from "../scripts/render/UIScreen.js";
+import {RenderObject, UIScreenObject} from "../scripts/render/RenderObject.js";
 
-export class MainMenu extends UIScreen{
+export class MainMenu extends UIScreenObject{
     private readonly canvas : HTMLCanvasElement;
     private readonly game: GameEngine
 
@@ -17,16 +17,17 @@ export class MainMenu extends UIScreen{
         this.canvas  = canvas;
         this.game = GameEngine.getInstance()
         this.menuTabs = new UniqueSet<MenuTab, "name">("name")
-    }
-
-    public load(){
-        this.addClickEventListener()
 
         this.generateTabs()
-        const ctx = this.canvas.getContext("2d");
-        if(ctx){
-            this.render(ctx)
-        }
+    }
+
+    //todo review logic
+    public load(){
+        this.addClickEventListener()
+        this.activateTab(MENU_TABS.BASE)
+    }
+
+    public update(dt: number) {
     }
 
     public generateTabs(){
@@ -63,20 +64,11 @@ export class MainMenu extends UIScreen{
         const tab = this.menuTabs.get(tabName)
         if(tab){
             tab.isActive = true
-            this.clearCanvasContext()
-            tab.draw()
+            console.log("Active tab: ", tab)
         }else {
             console.error("Tab not found")
         }
     }
-
-    private clearCanvasContext(){
-        const ctx = this.canvas.getContext("2d");
-        if(ctx) {
-            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-        }
-    }
-
 
     private genSkirmishTab(){
         const skirmishTab = new MenuTab(MENU_TABS.SKIRMISH, this.canvas)
@@ -150,11 +142,10 @@ export class MainMenu extends UIScreen{
     }
 
     render(ctx: CanvasRenderingContext2D){
-        console.log("Rendering main menu")
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
         for(const [_, tab] of this.menuTabs.entries()){
             if(tab.isActive){
-                tab.draw()
+                tab.draw(ctx)
                 break
             }
         }
@@ -162,6 +153,7 @@ export class MainMenu extends UIScreen{
 
     private addClickEventListener(){
         this.canvas.addEventListener("click", this.handleClick)
+        //todo find better place
         window.addEventListener("keyup", (e) => {
             if(e.code === "Escape"){
                 const isConfirmed: boolean = window.confirm("Are you sure you want to exit current game?")
@@ -179,6 +171,7 @@ export class MainMenu extends UIScreen{
         this.canvas.removeEventListener("click", this.handleClick)
     }
 
+    //todo fix to work for all ui
     private handleClick = (e: PointerEvent) => {
         const clickPos = getMousePosition(e, this.canvas)
         let activeTab: MenuTab | undefined

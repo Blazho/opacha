@@ -1,25 +1,20 @@
 import {UniqueSet} from "../helpers/UniqueSet.js";
-import {UIScreen} from "./UIScreen.js";
 import {MainMenu} from "../../ui/MainMenu.js";
 import {GameEngine} from "../GameEngine.js";
 import {LEVELS, SCREENS} from "../config/constants.js";
+import {GameObject, RenderObject, UIScreenObject} from "./RenderObject.js";
+import {RenderEngine} from "./RenderEngine.js";
+import {GameUIScreen} from "../../ui/GameUIScreen.js";
 
 
 export class UIEngine{
     private static instance: UIEngine | null = null
     private canvas: HTMLCanvasElement
-    private ctx: CanvasRenderingContext2D
 
-    private screens: UniqueSet<UIScreen, "id">
+    private screens: UniqueSet<UIScreenObject, "id">
 
     private constructor(canvas: HTMLCanvasElement)  {
         this.canvas = canvas
-        const context = canvas.getContext("2d")
-        if(!context){
-            throw new Error("[RenderEngine] Can not get context from canvas element")
-        }
-        this.ctx = context
-
         this.screens = new UniqueSet("id")
 
         this.initScreens()
@@ -28,7 +23,7 @@ export class UIEngine{
     public static init(canvas: HTMLCanvasElement){
         console.log("Initializing UI Engine")
         if(UIEngine.instance){
-            throw new Error("RenderEngine already initialized")
+            throw new Error("UIEngine already initialized")
         }
         UIEngine.instance = new UIEngine(canvas)
 
@@ -43,22 +38,40 @@ export class UIEngine{
     }
 
     public activate(screen: typeof SCREENS[keyof typeof SCREENS]){
+        console.log("To be activated screen", screen)
         for(const [_, screen] of this.screens.entries()){
             screen.isActive = false
         }
 
         const activeScreen = this.screens.get(screen)
         if(activeScreen){
+            console.log("Activated screen", activeScreen)
             activeScreen.isActive = true
-            console.log("Rendering: ", activeScreen)
-            activeScreen.render(this.ctx)
+            activeScreen.load()
         }
     }
 
+    public getActiveScreen(){
+        for(let [_, screen] of this.screens.entries()){
+            if(screen.isActive){
+                return screen.id
+            }
+        }
+
+        throw Error("Unable to get active screen")
+    }
+
     private initScreens(){
+        const renderEngine = RenderEngine.getInstance()
+
         const mainMenu = new MainMenu(this.canvas)
-        mainMenu.generateTabs()
+        mainMenu.isActive = false
+        renderEngine.addRenderObject(mainMenu)
         this.screens.add(mainMenu)
 
+        const tmp = new GameUIScreen()
+        tmp.isActive = false
+        renderEngine.addRenderObject(tmp)
+        this.screens.add(tmp)
     }
 }
