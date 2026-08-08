@@ -25,3 +25,9 @@ export const UI_SIZE = {
     buttonHeight: 80,
     buttonHeightS: 80
 } as const
+
+export const SCREENS = {
+    MAIN_MENU: "MainMenu",
+    GAME_SCREEN: "GameScreen",
+    END_GAME_SCREEN: "EndGameScreen",
+} as const

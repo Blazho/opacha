@@ -1,17 +1,19 @@
 import {Button} from "./Button.js";
 import {getMousePosition} from "../scripts/helpers/FHelper.js";
 import {MenuTab} from "./MenuTab.js";
-import {LEVELS, MENU_TABS, UI_SIZE} from "../scripts/config/constants.js";
+import {LEVELS, MENU_TABS, SCREENS, UI_SIZE} from "../scripts/config/constants.js";
 import {UniqueSet} from "../scripts/helpers/UniqueSet.js";
 import {GameEngine} from "../scripts/GameEngine.js";
+import {UIScreen} from "../scripts/render/UIScreen.js";
 
-export class MainMenu{
-    private canvas : HTMLCanvasElement;
+export class MainMenu extends UIScreen{
+    private readonly canvas : HTMLCanvasElement;
     private readonly game: GameEngine
 
     private menuTabs: UniqueSet<MenuTab, "name">
 
     constructor(canvas: HTMLCanvasElement) {
+        super(SCREENS.MAIN_MENU)
         this.canvas  = canvas;
         this.game = GameEngine.getInstance()
         this.menuTabs = new UniqueSet<MenuTab, "name">("name")
@@ -21,11 +23,13 @@ export class MainMenu{
         this.addClickEventListener()
 
         this.generateTabs()
-
-        this.draw()
+        const ctx = this.canvas.getContext("2d");
+        if(ctx){
+            this.render(ctx)
+        }
     }
 
-    private generateTabs(){
+    public generateTabs(){
         this.genBaseTab()
         this.genSkirmishTab()
         this.genCampaignTab()
@@ -145,15 +149,13 @@ export class MainMenu{
         return 200 + offset
     }
 
-    private draw(){
-        const ctx = this.canvas.getContext("2d");
-        if(ctx){
-            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
-            for(const [_, tab] of this.menuTabs.entries()){
-                if(tab.isActive){
-                    tab.draw()
-                    break
-                }
+    render(ctx: CanvasRenderingContext2D){
+        console.log("Rendering main menu")
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        for(const [_, tab] of this.menuTabs.entries()){
+            if(tab.isActive){
+                tab.draw()
+                break
             }
         }
     }
@@ -161,7 +163,6 @@ export class MainMenu{
     private addClickEventListener(){
         this.canvas.addEventListener("click", this.handleClick)
         window.addEventListener("keyup", (e) => {
-            //todo game does not reset completely
             if(e.code === "Escape"){
                 const isConfirmed: boolean = window.confirm("Are you sure you want to exit current game?")
                     if(isConfirmed){

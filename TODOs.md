@@ -33,7 +33,11 @@
 * - [x] Nodes continue to send after game ended
 * - [ ] AI still trying to process
 - [x] Paths are updated twice for each of the two nodes
-
+- [ ] UI Engine
+- * [ ] Rendering layering
+- * [ ] Main menu
+- * [ ] End game screen
+- * [ ] Game UI
 ## Optional
 
 - [x] Implementation: Attacking should send physical attack circle and not only visual 

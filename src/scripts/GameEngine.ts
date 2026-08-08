@@ -40,7 +40,7 @@ export class GameEngine{
         this.renderEngine = RenderEngine.init(this.canvas)
         this.gameObjects = new UniqueSet("id")
 
-        this.mainMenu.load()
+        // this.mainMenu.load()
     }
 
     public static init(canvasId: string){
