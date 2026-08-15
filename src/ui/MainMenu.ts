@@ -120,7 +120,11 @@ export class MainMenu extends UIScreenObject{
         let index = 0
         for(const value of Object.values(LEVELS)){
             listOfBtns.push(
-                new Button(value, UI_SIZE.buttonWidthS, UI_SIZE.buttonHeightS, {x: this.calcXWithOffset(index), y: this.calcYWithOffset(index)}, () => this.game.loadLevel(value))
+                new Button(value,
+                    UI_SIZE.buttonWidthS,
+                    UI_SIZE.buttonHeightS,
+                    {x: this.calcXWithOffset(index), y: this.calcYWithOffset(index)},
+                    () => this.game.loadLevel(value))
             )
             index++
         }

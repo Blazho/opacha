@@ -86,6 +86,7 @@ export class GameEngine{
         //todo
         if(this.uiEngine.getActiveScreen() == SCREENS.GAME_UI_SCREEN && this.isFinished){
             console.log("GAME FINISHED")
+            console.log("Render objects", this.renderEngine.getObj())
             // this.stop()
             this.gameObjects.clear()
             this.renderEngine.clearRenderObjects()

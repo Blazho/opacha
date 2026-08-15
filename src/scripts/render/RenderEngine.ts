@@ -1,5 +1,6 @@
 import {UniqueSet} from "../helpers/UniqueSet.js";
 import {RenderObject} from "./RenderObject.js";
+import {SCREENS} from "../config/constants.js";
 //todo layering
 export class RenderEngine{
     private canvas: HTMLCanvasElement;
@@ -33,11 +34,15 @@ export class RenderEngine{
     }
 
     public setRenderObjects(renderObjects: UniqueSet<RenderObject, 'id'>){
-        this.renderObjects = renderObjects
+        this.renderObjects.addAll(renderObjects)
     }
 
     public addRenderObject(renderObject: RenderObject){
         this.renderObjects.add(renderObject);
+    }
+
+    public getObj(){
+        return this.renderObjects;
     }
 
     public removeRenderObject(renderObject: RenderObject){
@@ -45,7 +50,14 @@ export class RenderEngine{
     }
 
     public clearRenderObjects(){
-        this.renderObjects.clear()
+        for (const [_, renderObj] of this.renderObjects.entries()) {
+            console.log("RenderObj id", renderObj.id)
+            // if(Object.values(SCREENS).includes(renderObj.id)){
+            if(SCREENS.)){
+                continue
+            }
+            this.renderObjects.delete(renderObj.id);
+        }
     }
 
     public render(){

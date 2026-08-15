@@ -15,6 +15,12 @@ export class UniqueSet<T, K extends keyof T> {
         this.items.set(idValue, item);
     }
 
+    addAll(items: UniqueSet<T, K>) {
+        for(const [_, item] of items.entries()) {
+            this.add(item)
+        }
+    }
+
     get(id: T[K]) {
         return this.items.get(id);
     }
